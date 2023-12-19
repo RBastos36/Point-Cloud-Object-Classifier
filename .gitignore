@@ -1,0 +1,7 @@
+__pycache__/
+.vscode
+**.code-workspace
+
+
+datasets/*
+!datasets/README.md
