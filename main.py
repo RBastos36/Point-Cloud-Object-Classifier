@@ -81,7 +81,7 @@ def main():
                       learning_rate=learning_rate,
                       num_epochs=num_epochs,
                       model_path='models/checkpoint.pkl',
-                      load_model=True)
+                      load_model=False)
     trainer.train()
 
     plt.show()
