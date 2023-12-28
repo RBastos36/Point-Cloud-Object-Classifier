@@ -15,6 +15,29 @@ from trainer import Trainer
 import torch.nn.functional as F
 
 
+def metrics_params(labels_gt, predicted_is, i):
+    # Count FP, FN, TP
+    TP, FP, FN = 0, 0, 0
+    for gt, pred in zip(labels_gt, predicted_is):
+
+        if gt == i and pred == i:  # True positive
+            TP += 1
+        elif gt != i and pred == i:  # False positive
+            FP += 1
+        elif gt == i and pred != i:  # False negative
+            FN += 1
+
+    return TP, FP, FN
+
+
+def metrics_calcs(TP, FP, FN):
+    precision = TP / (TP + FP)
+    recall = TP / (TP + FN)
+    f1_score = 2 * (precision * recall) / (precision + recall)
+
+    return precision, recall, f1_score
+
+
 def main():
 
     # -----------------------------------------------------------------
@@ -36,7 +59,7 @@ def main():
         dataset_filenames = json.load(f)
 
     test_filenames = dataset_filenames['test_filenames']
-    test_filenames = test_filenames[0:1000]
+    test_filenames = test_filenames[0:100]
 
     print('Used ' + str(len(test_filenames)) + ' for testing ')
 
@@ -101,33 +124,35 @@ def main():
     # print('labels_gt_np = ' + str(labels_gt_np))
     # print('labels_predicted_np = ' + str(labels_predicted_np))
 
-    # Count FP, FN, TP, and TN
-    TP0, FP0, FN0 = 0, 0, 0
-    for gt, pred in zip(labels_gt_np, predicted_is):
+    #------------------------------------------------------------
+    # Metrics - https://www.evidentlyai.com/classification-metrics/multi-class-metrics
+    #------------------------------------------------------------
+    TP0, FP0, FN0 = metrics_params(labels_gt_np, predicted_is, 0)   # Bowl metrics
+    TP1, FP1, FN1 = metrics_params(labels_gt_np, predicted_is, 1)   # Cap metrics
+    TP2, FP2, FN2 = metrics_params(labels_gt_np, predicted_is, 2)   # Cereal Box metrics
+    TP3, FP3, FN3 = metrics_params(labels_gt_np, predicted_is, 3)   # Coffee Mug metrics
+    TP4, FP4, FN4 = metrics_params(labels_gt_np, predicted_is, 4)   # Soda Can metrics
 
-        if gt == 0 and pred == 0:  # True positive
-            TP0 += 1
-        elif gt != 0 and pred == 0:  # False positive
-            FP0 += 1
-        elif gt == 0 and pred != 0:  # False negative
-            FN0 += 1
+    precision0, recall0, f1_score0 = metrics_calcs(TP0, FP0, FN0)   # Bowl metrics
+    precision1, recall1, f1_score1 = metrics_calcs(TP1, FP1, FN1)   # Cap metrics
+    precision2, recall2, f1_score2 = metrics_calcs(TP2, FP2, FN2)   # Cereal Box metrics
+    precision3, recall3, f1_score3 = metrics_calcs(TP3, FP3, FN3)   # Coffee Mug metrics
+    precision4, recall4, f1_score4 = metrics_calcs(TP4, FP4, FN4)   # Soda Can metrics
 
-    print('TP = ' + str(TP0))
-    print('FP = ' + str(FP0))
-    print('FN = ' + str(FN0))
+    precision_macro = (precision0 + precision1 + precision2 + precision3 + precision4) / 5
+    recall_macro = (recall0 + recall1 + recall2 + recall3 + recall4) / 5
+    f1_score_macro = 2 * (precision_macro * recall_macro) / (precision_macro + recall_macro)
 
-    # Compute precision and recall
-    precision = TP0 / (TP0 + FP0)
-    recall = TP0 / (TP0 + FN0)
-    f1_score = 2 * (precision*recall)/(precision+recall)
+    precision_micro = (TP0 + TP1 + TP2 + TP3 + TP4) / (TP0 + FP0 + TP1 + FP1 + TP2 + FP2 + TP3 + FP3 + TP4 + FP4)
+    recall_micro = (TP0 + TP1 + TP2 + TP3 + TP4) / (TP0 + FN0 + TP1 + FN1 + TP2 + FN2 + TP3 + FN3 + TP4 + FN4)
+    f1_score_micro = 2 * (precision_micro * recall_micro) / (precision_micro + recall_micro)
 
-    print('Precision = ' + str(precision))
-    print('Recall = ' + str(recall))
-    print('F1 score = ' + str(f1_score))
-
-    # Show image
-    # inputs = inputs.cpu().detach()
-    # print(inputs)
+    print('Macro Precision = ' + str(precision_macro))
+    print('Macro Recall = ' + str(recall_macro))
+    print('Macro F1 score = ' + str(f1_score_macro))
+    print('Micro Precision = ' + str(precision_micro))
+    print('Micro Recall = ' + str(recall_micro))
+    print('Micro F1 score = ' + str(f1_score_micro))
 
     fig = plt.figure()
     idx_image = 0
@@ -135,8 +160,8 @@ def main():
         for col in range(4):
             image_tensor = inputs[idx_image, :, :, :]
             image_pil = tensor_to_pil_image(image_tensor)
-            print('ground_truth is dog = ' + str(labels_gt_np[idx_image]))
-            print('predicted is dog = ' + str(predicted_is[idx_image]))
+            # print('ground_truth is dog = ' + str(labels_gt_np[idx_image]))
+            # print('predicted is dog = ' + str(predicted_is[idx_image]))
 
             ax = fig.add_subplot(4, 4, idx_image+1)
             plt.imshow(image_pil)
@@ -145,7 +170,7 @@ def main():
             ax.xaxis.set_ticks([])
             ax.yaxis.set_ticks([])
 
-            text = 'GT ' + str(labels_gt_np[idx_image]) + '\nPred ' + str(variables[predicted_is[idx_image]])
+            text = 'GT: ' + str(variables[labels_gt_np[idx_image]]) + '\nPred: ' + str(variables[predicted_is[idx_image]])
 
             if labels_gt_np[idx_image] == predicted_is[idx_image]:
                 color = 'green'
