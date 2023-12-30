@@ -59,7 +59,7 @@ def main():
         dataset_filenames = json.load(f)
 
     test_filenames = dataset_filenames['test_filenames']
-    test_filenames = test_filenames[0:100]
+    test_filenames = test_filenames[0:2000]
 
     print('Used ' + str(len(test_filenames)) + ' for testing ')
 
