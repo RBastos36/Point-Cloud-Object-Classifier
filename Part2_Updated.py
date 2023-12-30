@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Necessário para as scenes tal como a 5, onde o eixo dos z's passa a mesa.
+# a utilizar qd o eixo dos z's passa a mesa.
 
 
 import csv
@@ -52,7 +52,7 @@ class PlaneDetection():
     def colorizeInliers(self, r,g,b):
         self.inlier_cloud.paint_uniform_color([r,g,b]) # paints the plane in red
 
-    def segment(self, distance_threshold=0.16, ransac_n=3, num_iterations=1250):    #0.09 without cereal box
+    def segment(self, distance_threshold=0.15, ransac_n=3, num_iterations=1250):    #0.09 without cereal box
 
         print('Starting plane detection')
         plane_model, inlier_idxs = self.point_cloud.segment_plane(distance_threshold=distance_threshold, 
@@ -78,7 +78,7 @@ def main():
     # Initialization
     # ------------------------------------------
 
-    point_cloud_original = o3d.io.read_point_cloud('Scenes_pcd/05.pcd')
+    point_cloud_original = o3d.io.read_point_cloud('Scenes_pcd/03.pcd')
     print('loaded a point cloud with ' + str(len(point_cloud_original.points)))
 
     point_cloud_downsampled = point_cloud_original.voxel_down_sample(voxel_size=0.01) 
@@ -140,42 +140,23 @@ def main():
     #     #color = colormap[cluster_idx, 0:3]
     #     cluster.paint_uniform_color(color) # paints the table green
 
-    # Table plane detector
-    table_plane = None
-    table_plane_mean_y = 500
-    for plane_idx, plane in enumerate(planes):
-        center = plane.inlier_cloud.get_center()
-        print('Cloud ' + str(plane_idx) + ' has center ' + str(center))
+    # Detect table cluster as the one which is intersected by the z camera axis
+    minimum_mean_xy = 1000
+    table_cloud = None
+    for cluster_idx, cluster in enumerate(clusters):
+        center = cluster.get_center()
+        mean_x = center[0]
         mean_y = center[1]
-        if mean_y < table_plane_mean_y:
-            table_plane = plane
-            table_plane_mean_y = mean_y
+        mean_z = center[2]
 
-    #table_plane.colorizeInliers(r=1, g=0, b=0)
+        mean_xy = abs(mean_x) + abs(mean_y)
 
+        print('cluster ' + str(cluster_idx) + ' mean_xy=' + str(mean_xy))
 
-    # Cluster extraction
-    cluster_idxs = list(table_plane.inlier_cloud.cluster_dbscan(eps=0.15, min_points=25, print_progress=True))
-
-    # print(cluster_idxs)
-    # print(type(cluster_idxs))
-
-    possible_values = list(set(cluster_idxs))
-    if -1 in possible_values:
-        possible_values.remove(-1)
-    print(possible_values)
-
-    largest_cluster_num_points = 0
-    largest_cluster_idx = None
-    for value in possible_values:
-        num_points = cluster_idxs.count(value)
-        if num_points > largest_cluster_num_points:
-            largest_cluster_idx = value
-            largest_cluster_num_points = num_points
-
-    largest_idxs = list(locate(cluster_idxs, lambda x: x == largest_cluster_idx))
-    table_cloud = table_plane.inlier_cloud.select_by_index(largest_idxs)
-
+        if mean_xy < minimum_mean_xy:
+            minimum_mean_xy = mean_xy
+            table_cloud = cluster
+        
     #table_cloud.paint_uniform_color([0,1,0]) # paints the table green
 
     # Auto define table reference frame
@@ -241,12 +222,13 @@ def main():
     # ------------------------------------------
 
     # Create a list of entities to draw --------
+    
     entities = []
     #entities = [x.inlier_cloud for x in planes]
     #entities = [cluster for cluster in clusters]
     # entities = [point_cloud_original]
-    #entities.append(table_cloud)
-    # entities.append(pcd_objects)
+    #entities.append(point_cloud)
+    #entities.append(pcd_objects)
     #entities.append()
     entities.extend(pcd_separate_objects)
 
