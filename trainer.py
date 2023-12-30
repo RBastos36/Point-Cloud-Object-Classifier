@@ -68,10 +68,12 @@ class Trainer():
 
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             # https://github.com/pytorch/pytorch/issues/2830
-            for state in self.optimizer.state.values():
-                for k, v in state.items():
-                    if isinstance(v, torch.Tensor):
-                        state[k] = v.cuda()
+
+            if torch.cuda.is_available():
+                for state in self.optimizer.state.values():
+                    for k, v in state.items():
+                        if isinstance(v, torch.Tensor):
+                            state[k] = v.cuda()
 
             start_epoch = checkpoint['epoch_idx']
             epoch_train_losses = checkpoint['epoch_train_losses']

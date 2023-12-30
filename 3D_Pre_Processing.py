@@ -37,15 +37,16 @@ def main():
     # Initialization
     # -----------------------------------------------------------------
 
-    pcd_original = o3d.io.read_point_cloud('Scenes/pc/01.ply')
+    pcd_original = o3d.io.read_point_cloud('datasets/01.pcd')
 
     # -----------------------------------------------------------------
     # Execution
     # -----------------------------------------------------------------
 
     # Downsample using voxel grid ------------------------------------
-    pcd_downsampled = pcd_original.voxel_down_sample(voxel_size=0.02)
+    pcd_downsampled = pcd_original.voxel_down_sample(voxel_size=0.015)
     # pcd_downsampled.paint_uniform_color([1,0,0])
+    #pcd_downsampled = pcd_original
 
     # estimate normals
     pcd_downsampled.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
@@ -139,7 +140,10 @@ def main():
     # --------------------------------------
 
     #labels = pcd_objects.cluster_dbscan(eps=0.065, min_points=60, print_progress=True)    # valores com chapeu todo, mas 2 juntos
-    labels = pcd_objects.cluster_dbscan(eps=0.04, min_points=30, print_progress=True)      # valores com tudo separado, mas chapeu a meio 
+    #labels = pcd_objects.cluster_dbscan(eps=0.04, min_points=30, print_progress=True)      # valores com tudo separado, mas chapeu a meio 
+
+    labels = pcd_objects.cluster_dbscan(eps=0.0435, min_points=65, print_progress=True)      # valores para voxel size = 0.015 - chapeu cortado a meio
+
 
 
     #print("Max label:", max(labels))
@@ -186,7 +190,7 @@ def main():
     entities.append(frame_world)
     entities.extend(pcds_to_draw)
     o3d.visualization.draw_geometries(entities,
-                                      zoom=0.3412,
+                                      zoom=0.44120000000000009,
                                       front=view['trajectory'][0]['front'],
                                       lookat=view['trajectory'][0]['lookat'],
                                       up=view['trajectory'][0]['up'], point_show_normal=False)
