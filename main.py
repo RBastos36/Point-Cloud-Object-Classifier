@@ -38,8 +38,8 @@ def main():
     train_filenames = dataset_filenames['train_filenames']
     validation_filenames = dataset_filenames['validation_filenames']
 
-    # train_filenames = train_filenames[0:1000]
-    # validation_filenames = validation_filenames[0:200]
+    train_filenames = train_filenames[0:500]
+    validation_filenames = validation_filenames[0:200]
 
     print('Used ' + str(len(train_filenames)) + ' for training and ' + str(len(validation_filenames)) +
           ' for validation.')

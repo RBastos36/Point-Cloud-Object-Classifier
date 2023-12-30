@@ -14,12 +14,11 @@ class Dataset(torch.utils.data.Dataset):
         self.number_of_images = len(self.filenames)
 
         # Compute the corresponding labels
-        # self.labels should be like ['cat', 'dog', 'cat'], but we will use [1, 0, 1] because of pytorch
         self.labels = []
         for filename in self.filenames:
             basename = os.path.basename(filename)
             blocks = basename.split('_')
-            label = blocks[0]  # because basename is "cat.2109.jpg"
+            label = blocks[0]  # because basename is "bowl_1_1_1_crop.png"
 
             if label == 'bowl':
                 self.labels.append(0)
