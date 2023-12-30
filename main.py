@@ -32,6 +32,8 @@ def main():
     train_filenames = dataset_filenames['train_filenames']
     validation_filenames = dataset_filenames['validation_filenames']
 
+    train_filenames = train_filenames[0:500]
+    validation_filenames = validation_filenames[0:200]
 
     # While testing, use smaller datasets
     train_filenames = train_filenames[0:1000]
@@ -57,7 +59,7 @@ def main():
                       learning_rate=learning_rate,
                       num_epochs=num_epochs,
                       model_path='models/checkpoint.pkl',
-                      load_model=True)
+                      load_model=False)
     trainer.train()
 
     plt.show()
