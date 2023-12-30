@@ -206,15 +206,29 @@ def main():
 
 
     pcd_separate_objects = []
+    pcd_objects_original = []
     for group_idx in group_idxs:  # Cycle all groups, i.e.,
 
         group_points_idxs = list(locate(labels, lambda x: x == group_idx))
 
         pcd_separate_object = pcd_objects.select_by_index(group_points_idxs, invert=False)
 
+        pcd_objects_original.append(deepcopy(pcd_separate_object))
+
         color = colormap[group_idx, 0:3]
         pcd_separate_object.paint_uniform_color(color)
         pcd_separate_objects.append(pcd_separate_object)
+
+
+    # Tests with getting images of the objects
+    vis = o3d.visualization.Visualizer()
+    vis.create_window(visible=False)
+    vis.add_geometry(pcd_objects_original[0])
+    vis.update_geometry(pcd_objects_original[0])
+    vis.poll_events()
+    vis.update_renderer()
+    vis.capture_screen_image('test.png')
+    vis.destroy_window()
 
 
     # ------------------------------------------
