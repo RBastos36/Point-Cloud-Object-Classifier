@@ -5,5 +5,6 @@ __pycache__/
 
 datasets/*
 !datasets/README.md
+!datasets_point_cloud/README.md
 *.label
 *.pose
