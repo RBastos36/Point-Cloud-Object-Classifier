@@ -1,0 +1,18 @@
+
+
+Caso 1 - referencial pasas na mesa:
+
+Cenas 01, 02, 03, 04 (necessário melhoria)
+
+
+Caso 2 - referencial não passa pela mesa (necessário altura):
+
+Cenas 05, 06 (necessário melhoria), 07 (necessário melhoria), 
+
+
+Cenas em que nenhum está a funcionar:
+
+Cenas 08 (caso 2, não está a detetar bem a mesa), 09 (caso 1 - capta bem a mesa, mas não está a dar para sacar os pontos), 10 (caso 1 - deteta mal a mesa), 11 (caso 1, mas não está a detetar corretamente), 12 (caso 1 - não está a detetar corretamente), 13 (ambos os casos - deteção muito diferente), 14 (ambos os casos - mesmo cenário do 13)
+
+
+

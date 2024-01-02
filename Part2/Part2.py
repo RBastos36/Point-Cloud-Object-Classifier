@@ -78,6 +78,10 @@ def main():
     # Initialization
     # ------------------------------------------
 
+
+# Scene 01, 02, 03, 04 (meio mal captado), 
+    
+    
     point_cloud_original = o3d.io.read_point_cloud('Scenes_pcd/03.pcd')
     print('loaded a point cloud with ' + str(len(point_cloud_original.points)))
 
@@ -228,14 +232,14 @@ def main():
     #entities = [cluster for cluster in clusters]
     # entities = [point_cloud_original]
     #entities.append(point_cloud)
-    #entities.append(pcd_objects)
+    #entities.append(table_cloud)
     #entities.append()
     entities.extend(pcd_separate_objects)
 
 
 
-    # frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=3.0, origin=np.array([0., 0., 0.]))
-    # entities.append(frame)
+    frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=3.0, origin=np.array([0., 0., 0.]))
+    entities.append(frame)
 
     o3d.visualization.draw_geometries(entities,
                                     zoom=view['trajectory'][0]['zoom'],
