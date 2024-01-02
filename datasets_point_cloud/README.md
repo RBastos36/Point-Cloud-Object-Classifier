@@ -1,6 +1,7 @@
 # datasets
 
 http://rgbd-dataset.cs.washington.edu/dataset/
+http://rgbd-dataset.cs.washington.edu/dataset/rgbd-dataset_pcd_ascii/
 
 
 ### Objects
