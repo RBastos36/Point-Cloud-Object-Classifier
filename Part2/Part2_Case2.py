@@ -20,8 +20,6 @@ from matplotlib import cm
 from more_itertools import locate
 
 
-
-
 view = {
 	"class_name" : "ViewTrajectory",
 	"interval" : 29,
@@ -29,19 +27,18 @@ view = {
 	"trajectory" : 
 	[
 		{
-			"boundingbox_max" : [ 0.25400664836545533, 0.0068996944464743137, 1.7933573424816132 ],
-			"boundingbox_min" : [ -0.39337321935277997, -0.38851740956306458, 0.90994936227798462 ],
+			"boundingbox_max" : [ 1.648259162902832, 0.17168067395687103, 1.7319790124893188 ],
+			"boundingbox_min" : [ 0.76354414224624634, -0.17333842813968658, 0.89897191524505615 ],
 			"field_of_view" : 60.0,
-			"front" : [ 0.88130556085861278, -0.1316666054674317, -0.45383302370405987 ],
-			"lookat" : [ -0.069683285493662317, -0.19080885755829513, 1.3516533523797989 ],
-			"up" : [ -0.2803376060669458, -0.91881707853204286, -0.27782369017507424 ],
-			"zoom" : 0.76000000000000001
+			"front" : [ 0.76868665380378454, -0.62384756489317472, 0.14119151547029002 ],
+			"lookat" : [ 1.2059016525745392, -0.00082887709140777588, 1.3154754638671875 ],
+			"up" : [ -0.54858848092307122, -0.75652228416597067, -0.35598414593745553 ],
+			"zoom" : 0.90000000000000013
 		}
 	],
 	"version_major" : 1,
 	"version_minor" : 0
 }
-
 
 
 class PlaneDetection():
@@ -78,7 +75,9 @@ def main():
     # Initialization
     # ------------------------------------------
 
-    point_cloud_original = o3d.io.read_point_cloud('Scenes_pcd/05.pcd')
+# Scene 05, 06 (meio mal captado), 07 (meio mal captadp), 
+
+    point_cloud_original = o3d.io.read_point_cloud('Scenes_pcd/13.pcd')
     print('loaded a point cloud with ' + str(len(point_cloud_original.points)))
 
     point_cloud_downsampled = point_cloud_original.voxel_down_sample(voxel_size=0.01) 
@@ -142,7 +141,7 @@ def main():
 
     # Table plane detector
     table_plane = None
-    table_plane_mean_y = 500
+    table_plane_mean_y = 1000
     for plane_idx, plane in enumerate(planes):
         center = plane.inlier_cloud.get_center()
         print('Cloud ' + str(plane_idx) + ' has center ' + str(center))
@@ -245,9 +244,9 @@ def main():
     #entities = [x.inlier_cloud for x in planes]
     #entities = [cluster for cluster in clusters]
     # entities = [point_cloud_original]
-    #entities.append(table_cloud)
+    # entities.append(table_cloud)
     # entities.append(pcd_objects)
-    #entities.append()
+    # entities.append()
     entities.extend(pcd_separate_objects)
 
 
