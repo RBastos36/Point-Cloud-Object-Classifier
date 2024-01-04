@@ -3,9 +3,17 @@ __pycache__/
 **.code-workspace
 
 
-datasets/*
-!datasets/README.md
-datasets_point_cloud/*
-!datasets_point_cloud/README.md
+datasets/Test_Only/*
+!datasets/Test_Only/README.md
+
+datasets/Train_Validation/*
+!datasets/Train_Validation/README.md
+
+datasets_point_cloud/Test_Only/*
+!datasets_point_cloud/Test_Only/README.md
+
+datasets_point_cloud/Train_Validation/*
+!datasets_point_cloud/Train_Validation/README.md
+
 *.label
 *.pose
