@@ -6,11 +6,11 @@ __pycache__/
 # Large datasets
 data/objects/*
 data/objects_pcd/*
-!data/*/**/README.md
+!data/**/README.md
 
 
 # Temporary files
-**/pcd_point_cloud.pcd
+**pcd_point_cloud.pcd
 
 
 *.label

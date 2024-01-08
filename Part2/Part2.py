@@ -79,10 +79,12 @@ def main():
     # ------------------------------------------
 
 
-# Scene 01, 02, 03, 04 (meio mal captado), 
+    # Scene 01, 02, 03, 04 (meio mal captado), 
     
     
-    point_cloud_original = o3d.io.read_point_cloud('Scenes_pcd/03.pcd')
+    point_cloud_original = o3d.io.read_point_cloud('data/scenes/pcd/03.pcd')
+    if len(point_cloud_original.points) < 1:
+        exit('File not found')
     print('loaded a point cloud with ' + str(len(point_cloud_original.points)))
 
     point_cloud_downsampled = point_cloud_original.voxel_down_sample(voxel_size=0.01) 
