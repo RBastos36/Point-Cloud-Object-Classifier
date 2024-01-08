@@ -2,18 +2,15 @@ __pycache__/
 .vscode
 **.code-workspace
 
-
-datasets/Test_Only/*
-!datasets/Test_Only/README.md
-
-datasets/Train_Validation/*
-!datasets/Train_Validation/README.md
-
-datasets_point_cloud/Test_Only/*
-!datasets_point_cloud/Test_Only/README.md
-
-datasets_point_cloud/Train_Validation/*
-!datasets_point_cloud/Train_Validation/README.md
+data/*
+!data/scenes/
+!data/objects/README.md
 
 *.label
 *.pose
+
+pcd_point_cloud.pcd
+
+# Remove these later
+datasets/
+datasets_point_cloud/
