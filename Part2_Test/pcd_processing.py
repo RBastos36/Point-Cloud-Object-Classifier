@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 
-import csv
-import math
-import pickle
-from copy import deepcopy
-from random import randint
-from turtle import color
 
+import math
+from copy import deepcopy
 import open3d as o3d
 import cv2
 import numpy as np

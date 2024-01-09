@@ -70,7 +70,7 @@ def main():
 
     # Get scene datapath and load scene
 
-    datapath = 'data/scenes/pcd/01.pcd'
+    datapath = 'data/scenes/pcd/03.pcd'
 
     p.loadPointCloud(datapath)
 
