@@ -11,6 +11,7 @@ import glob
 from copy import deepcopy
 from random import randint
 from turtle import color
+from colorama import Fore, Style
 
 import open3d as o3d
 import cv2
@@ -87,7 +88,7 @@ def main():
         exit('File not found')
     print('loaded a point cloud with ' + str(len(point_cloud_original.points)))
 
-    point_cloud_downsampled = point_cloud_original.voxel_down_sample(voxel_size=0.01) 
+    point_cloud_downsampled = point_cloud_original.voxel_down_sample(voxel_size=0.005) 
     print('After downsampling point cloud has ' + str(len(point_cloud_downsampled.points)) + ' points')
 
 
@@ -140,11 +141,11 @@ def main():
             clusters.append(deepcopy(cluster_cloud))
 
 
-    #colormap = cm.Pastel1(list(range(0,len(clusters))))
-    # colormap = cm.hsv(list(range(0,len(clusters))))
-    # for cluster_idx, cluster in enumerate(clusters):
-    #     #color = colormap[cluster_idx, 0:3]
-    #     cluster.paint_uniform_color(color) # paints the table green
+    colormap = cm.Pastel1(list(range(0,len(clusters))))
+    colormap = cm.hsv(list(range(0,len(clusters))))
+    for cluster_idx, cluster in enumerate(clusters):
+        color = colormap[cluster_idx, 0:3]
+        cluster.paint_uniform_color(color) # paints the table green
 
     # Detect table cluster as the one which is intersected by the z camera axis
     minimum_mean_xy = 1000
@@ -198,8 +199,9 @@ def main():
 
     #labels = pcd_objects.cluster_dbscan(eps=0.065, min_points=60, print_progress=True)    # valores com chapeu todo, mas 2 juntos
     #labels = pcd_objects.cluster_dbscan(eps=0.04, min_points=30, print_progress=True)      # valores com tudo separado, mas chapeu a meio 
+    #labels = pcd_objects.cluster_dbscan(eps = 0.034, min_points = 80, print_progress = True)  # valores para voxel size = 0.015 - chapeu cortado a meio
 
-    labels = pcd_objects.cluster_dbscan(eps = 0.034, min_points = 80, print_progress = True)      # valores para voxel size = 0.015 - chapeu cortado a meio
+    labels = pcd_objects.cluster_dbscan(eps = 0.017, min_points = 100, print_progress = True)      # valores para voxel size = 0.05 - no cenário 3 fica quase perfeito
 
     #print("Max label:", max(labels))
 
@@ -231,17 +233,18 @@ def main():
     
     entities = []
     #entities = [x.inlier_cloud for x in planes]
-    #entities = [cluster for cluster in clusters]
+    # entities = [cluster for cluster in clusters]
     # entities = [point_cloud_original]
     #entities.append(point_cloud)
     #entities.append(table_cloud)
-    #entities.append()
+    # entities.append(clusters)
     entities.extend(pcd_separate_objects)
+    #entities.extend(clusters)
 
 
 
-    frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=3.0, origin=np.array([0., 0., 0.]))
-    entities.append(frame)
+    # frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=3.0, origin=np.array([0., 0., 0.]))
+    # entities.append(frame)
 
     o3d.visualization.draw_geometries(entities,
                                     zoom=view['trajectory'][0]['zoom'],
