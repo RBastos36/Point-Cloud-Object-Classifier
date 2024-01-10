@@ -70,7 +70,7 @@ def main():
 
     # Get scene datapath and load scene
 
-    datapath = 'data/scenes/pcd/14.pcd'
+    datapath = 'data/scenes/pcd/05.pcd'
 
     p.loadPointCloud(datapath)
 
@@ -124,7 +124,7 @@ def main():
     p.transform(0,-7,0,0,0,0)
 
     # Cropping point cloud
-    p.crop(-0.6, -0.5, -0.02, 0.6, 0.5, 0.5)
+    p.crop(-0.6, -0.5, -0.025, 0.6, 0.5, 0.5)
 
     # Find plane
     outliers = p.findPlane()
@@ -133,7 +133,7 @@ def main():
     # Clustering
     # ------------------------------------------------------
 
-    cluster_idxs = list(outliers.cluster_dbscan(eps=0.032, min_points=80, print_progress=True))
+    cluster_idxs = list(outliers.cluster_dbscan(eps=0.0325, min_points=80, print_progress=True))
     object_idxs = list(set(cluster_idxs))
     object_idxs.remove(-1)
 
@@ -168,8 +168,8 @@ def main():
 
     entities = []
 
-    # frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=0.5, origin=np.array([0., 0., 0.]))
-    # entities.append(frame)
+    frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=0.5, origin=np.array([0., 0., 0.]))
+    entities.append(frame)
 
     # Draw bbox
     bbox_to_draw = o3d.geometry.LineSet.create_from_axis_aligned_bounding_box(p.bbox)
@@ -179,7 +179,8 @@ def main():
     for object_idx, object in enumerate(objects):
         entities.append(object['points'])
 
-    # entities = [outliers]
+    # point_cloud_original = point_cloud_original.voxel_down_sample(voxel_size=0.02) 
+    # entities = [point_cloud_original]
 
     # frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=3.0, origin=np.array([0., 0., 0.]))
     # entities.append(frame)
