@@ -6,6 +6,7 @@ __pycache__/
 # Large datasets
 data/objects/*
 data/objects_pcd/*
+data/objects_pts/*
 !data/**/README.md
 
 
