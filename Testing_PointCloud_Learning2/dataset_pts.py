@@ -4,7 +4,27 @@
 import os
 import torch
 from torchvision import transforms
+import torch_geometric.transforms as T
 from PIL import Image
+from torch_geometric.data import Data
+
+
+
+def read_node_features(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+        node_features = [list(map(float, line.strip().split())) for line in lines]
+
+    return node_features
+
+def create_graph_data(node_features):
+    x = torch.tensor(node_features, dtype=torch.float)
+
+    #For simplicity, let's create a graph with no edges.
+    edge_index = torch.tensor([], dtype=torch.long)
+
+    data = Data(x=x, edge_index=edge_index)
+    return data
 
 
 class Dataset(torch.utils.data.Dataset):
@@ -17,8 +37,9 @@ class Dataset(torch.utils.data.Dataset):
         self.labels = []
         for filename in self.filenames:
             basename = os.path.basename(filename)
+            print(basename)
             blocks = basename.split('_')
-            label = blocks[0]  # because basename is "bowl_1_1_1_crop.png"
+            label = blocks[0]  # because basename is "bowl_1_1_1.pts"
 
             if label == 'bowl':
                 self.labels.append(0)
@@ -33,11 +54,13 @@ class Dataset(torch.utils.data.Dataset):
             else:
                 raise ValueError('Unknown label ' + label)
 
+        self.pre_transforms = T.NormalizeScale()
+        self.transforms = T.SamplePoints(1024)
 
-        self.transforms = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor()
-        ])
+        # self.transforms = transforms.Compose([
+        #     transforms.Resize((224, 224)),
+        #     transforms.ToTensor()
+        # ])
 
     def __len__(self):
         # must return the size of the data
@@ -48,12 +71,15 @@ class Dataset(torch.utils.data.Dataset):
 
         # Load the image in pil format
         filename = self.filenames[index]
-        pil_image = Image.open(filename)
 
         # Convert to tensor
-        tensor_image = self.transforms(pil_image)
+        # pre_tensor_pointcloud = self.pre_transforms(filename)
+        node_features = read_node_features(filename)
+        graph_data = create_graph_data(node_features)
+        tensor_pointcloud = self.transforms(graph_data)
 
         # Get corresponding label
         label = self.labels[index]
 
-        return tensor_image, label
+        return tensor_pointcloud, label
+    

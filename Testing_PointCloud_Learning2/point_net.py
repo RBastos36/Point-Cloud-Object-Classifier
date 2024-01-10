@@ -14,6 +14,7 @@ that is a different architecture and is not implemented here.
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 
 # ============================================================================
@@ -44,7 +45,8 @@ class Tnet(nn.Module):
         
 
     def forward(self, x):
-        bs = x.shape[0]
+        # bs = x.shape[0]
+        bs = np.shape(x)[0]
 
         # pass through shared MLP layers (conv1d)
         x = self.bn1(F.relu(self.conv1(x)))
@@ -128,7 +130,8 @@ class PointNetBackbone(nn.Module):
     def forward(self, x):
 
         # get batch size
-        bs = x.shape[0]
+        # bs = x.shape[0]
+        bs = np.shape(x)[0]
         
         # pass through first Tnet to get transform matrix
         A_input = self.tnet1(x)
@@ -208,84 +211,84 @@ class PointNetClassHead(nn.Module):
         return x, crit_idxs, A_feat
 
 
-# ============================================================================
-# Segmentation Head
-class PointNetSegHead(nn.Module):
-    ''' Segmentation Head '''
-    def __init__(self, num_points=2500, num_global_feats=1024, m=2):
-        super(PointNetSegHead, self).__init__()
+# # ============================================================================
+# # Segmentation Head
+# class PointNetSegHead(nn.Module):
+#     ''' Segmentation Head '''
+#     def __init__(self, num_points=2500, num_global_feats=1024, m=2):
+#         super(PointNetSegHead, self).__init__()
 
-        self.num_points = num_points
-        self.m = m
+#         self.num_points = num_points
+#         self.m = m
 
-        # get the backbone 
-        self.backbone = PointNetBackbone(num_points, num_global_feats, local_feat=True)
+#         # get the backbone 
+#         self.backbone = PointNetBackbone(num_points, num_global_feats, local_feat=True)
 
-        # shared MLP
-        num_features = num_global_feats + 64 # local and global features
-        self.conv1 = nn.Conv1d(num_features, 512, kernel_size=1)
-        self.conv2 = nn.Conv1d(512, 256, kernel_size=1)
-        self.conv3 = nn.Conv1d(256, 128, kernel_size=1)
-        self.conv4 = nn.Conv1d(128, m, kernel_size=1)
+#         # shared MLP
+#         num_features = num_global_feats + 64 # local and global features
+#         self.conv1 = nn.Conv1d(num_features, 512, kernel_size=1)
+#         self.conv2 = nn.Conv1d(512, 256, kernel_size=1)
+#         self.conv3 = nn.Conv1d(256, 128, kernel_size=1)
+#         self.conv4 = nn.Conv1d(128, m, kernel_size=1)
 
-        # batch norms for shared MLP
-        self.bn1 = nn.BatchNorm1d(512)
-        self.bn2 = nn.BatchNorm1d(256)
-        self.bn3 = nn.BatchNorm1d(128)
+#         # batch norms for shared MLP
+#         self.bn1 = nn.BatchNorm1d(512)
+#         self.bn2 = nn.BatchNorm1d(256)
+#         self.bn3 = nn.BatchNorm1d(128)
 
 
-    def forward(self, x):
+#     def forward(self, x):
         
-        # get combined features
-        x, crit_idxs, A_feat = self.backbone(x) 
+#         # get combined features
+#         x, crit_idxs, A_feat = self.backbone(x) 
 
-        # pass through shared MLP
-        x = self.bn1(F.relu(self.conv1(x)))
-        x = self.bn2(F.relu(self.conv2(x)))
-        x = self.bn3(F.relu(self.conv3(x)))
-        x = self.conv4(x)
+#         # pass through shared MLP
+#         x = self.bn1(F.relu(self.conv1(x)))
+#         x = self.bn2(F.relu(self.conv2(x)))
+#         x = self.bn3(F.relu(self.conv3(x)))
+#         x = self.conv4(x)
 
-        x = x.transpose(2, 1)
+#         x = x.transpose(2, 1)
         
-        return x, crit_idxs, A_feat
+#         return x, crit_idxs, A_feat
 
     
-# ============================================================================
-# Test 
-def main():
-    test_data = torch.rand(32, 3, 2500)
+# # ============================================================================
+# # Test 
+# def main():
+#     test_data = torch.rand(32, 3, 2500)
 
-    ## test T-net
-    tnet = Tnet(dim=3)
-    transform = tnet(test_data)
-    print(f'T-net output shape: {transform.shape}')
+#     ## test T-net
+#     tnet = Tnet(dim=3)
+#     transform = tnet(test_data)
+#     print(f'T-net output shape: {transform.shape}')
 
-    ## test backbone
-    pointfeat = PointNetBackbone(local_feat=False)
-    out, _, _ = pointfeat(test_data)
-    print(f'Global Features shape: {out.shape}')
+#     ## test backbone
+#     pointfeat = PointNetBackbone(local_feat=False)
+#     out, _, _ = pointfeat(test_data)
+#     print(f'Global Features shape: {out.shape}')
 
-    pointfeat = PointNetBackbone(local_feat=True)
-    out, _, _ = pointfeat(test_data)
-    print(f'Combined Features shape: {out.shape}')
+#     pointfeat = PointNetBackbone(local_feat=True)
+#     out, _, _ = pointfeat(test_data)
+#     print(f'Combined Features shape: {out.shape}')
 
-    # test on single batch (should throw error if there is an issue)
-    pointfeat = PointNetBackbone(local_feat=True).eval()
-    out, _, _ = pointfeat(test_data[0, :, :].unsqueeze(0))
+#     # test on single batch (should throw error if there is an issue)
+#     pointfeat = PointNetBackbone(local_feat=True).eval()
+#     out, _, _ = pointfeat(test_data[0, :, :].unsqueeze(0))
 
-    ## test classification head
-    classifier = PointNetClassHead(k=5)
-    out, _, _ = classifier(test_data)
-    print(f'Class output shape: {out.shape}')
+#     ## test classification head
+#     classifier = PointNetClassHead(k=5)
+#     out, _, _ = classifier(test_data)
+#     print(f'Class output shape: {out.shape}')
 
-    classifier = PointNetClassHead(k=5).eval()
-    out, _, _ = classifier(test_data[0, :, :].unsqueeze(0))
+#     classifier = PointNetClassHead(k=5).eval()
+#     out, _, _ = classifier(test_data[0, :, :].unsqueeze(0))
 
-    ## test segmentation head
-    seg = PointNetSegHead(m=3)
-    out, _, _ = seg(test_data)
-    print(f'Seg shape: {out.shape}')
+#     ## test segmentation head
+#     seg = PointNetSegHead(m=3)
+#     out, _, _ = seg(test_data)
+#     print(f'Seg shape: {out.shape}')
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
