@@ -26,5 +26,5 @@ if __name__ == "__main__":
             
             convert_ply_to_pcd(input_ply, output_pcd)
 
-    print("Conversão concluída.")
+    print("All done.")
 
