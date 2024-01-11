@@ -10,7 +10,6 @@ from matplotlib import cm
 from more_itertools import locate
 
 
-
 # Default view
 view = {
             "class_name" : "ViewTrajectory",
@@ -32,7 +31,6 @@ view = {
             "version_minor" : 0
         }
 
-
 class PlaneDetection:
     def __init__(self, point_cloud):
 
@@ -41,8 +39,7 @@ class PlaneDetection:
     def colorizeInliers(self, r, g, b):
         self.inlier_cloud.paint_uniform_color([r, g, b])
 
-    # Find plane
-    def segment(self, distance_threshold=0.03, ransac_n=4, num_iterations=200):
+    def segment(self, distance_threshold=0.03, ransac_n=4, num_iterations=200):    # Find plane
 
         print('Starting plane detection')
         plane_model, inlier_idxs = self.point_cloud.segment_plane(distance_threshold=distance_threshold, ransac_n=ransac_n, num_iterations=num_iterations)
@@ -55,6 +52,7 @@ class PlaneDetection:
         return outlier_cloud
 
     def __str__(self):
+
         text = 'Segmented plane from pc with ' + str(len(self.point_cloud.points)) + ' with ' + str(len(self.inlier_cloud.points)) + ' inliers. '
         text += '\nPlane: ' + str(self.a) + ' x + ' + str(self.b) + ' y + ' + str(self.c) + ' z + ' + str(self.d) + ' = 0'
         return text
@@ -68,35 +66,34 @@ def main():
 
     p = PointCloudProcessing()
 
+
     # Get scene datapath and load scene
 
     datapath = 'data/scenes/pcd/05.pcd'
     # datapath = 'data/scenes/pcd_new/05.pcd'
     # datapath = 'data/scenes/ply_original/05.ply'
     
-
     p.loadPointCloud(datapath)
-
     p.preProcess(voxel_size=0.009)
-
 
     # ------------------------------------------
     # Find table
     # ------------------------------------------
 
-    point_cloud_original = o3d.io.read_point_cloud(datapath)
+    original_pcd = o3d.io.read_point_cloud(datapath)
 
     # Estimate normals
 
-    point_cloud_original.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.05, max_nn=25))
-    point_cloud_original.orient_normals_to_align_with_direction(orientation_reference=np.array([0., 0., 1.]))
+    original_pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.05, max_nn=25))
+    original_pcd.orient_normals_to_align_with_direction(orientation_reference=np.array([0., 0., 1.]))
 
     # Angle tolerance verification
+
     angle_tolerance = 0.05
     vx, vy, vz = 1, 0, 0
     norm_b = math.sqrt(vx ** 2 + vy ** 2 + vz ** 2)
     horizontal_idxs = []
-    for idx, normal in enumerate(point_cloud_original.normals):
+    for idx, normal in enumerate(original_pcd.normals):
 
         nx, ny, nz = normal
         ab = nx*vx + ny*vy + nz*vz
@@ -107,57 +104,66 @@ def main():
             horizontal_idxs.append(idx)
 
     # Get horizontal pointcloud
-    horizontal_cloud = point_cloud_original.select_by_index(horizontal_idxs)
-    non_horizontal_cloud = point_cloud_original.select_by_index(horizontal_idxs, invert=True)
+            
+    horizontal_cloud = original_pcd.select_by_index(horizontal_idxs)
+    _ = original_pcd.select_by_index(horizontal_idxs, invert=True)      # Non horizontal points
 
     # Remove unwanted points
-    (table_point_cloud, lista) = horizontal_cloud.remove_radius_outlier(150, 0.3)
+
+    (table_point_cloud, _) = horizontal_cloud.remove_radius_outlier(150, 0.3)
 
     # Get table plane
+
     table_plane = PlaneDetection(table_point_cloud)
     table_plane_point_cloud = table_plane.segment()
 
     # Get table center
+
     table_center = table_plane_point_cloud.get_center()
 
     # Positioning coordinate axis in the middle of table
+
     p.transform(0,0,0,-table_center[0],-table_center[1],-table_center[2])
     p.transform(-120,0,0,0,0,0)
     p.transform(0,0,-120,0,0,0)
     p.transform(0,-7,0,0,0,0)
 
     # Cropping point cloud
+
     p.crop(-0.6, -0.5, -0.025, 0.6, 0.5, 0.5)
 
     # Find plane
-    outliers = p.findPlane()
+
+    all_objects = p.findPlane()
     
     # ------------------------------------------------------
     # Clustering
     # ------------------------------------------------------
 
-    cluster_idxs = list(outliers.cluster_dbscan(eps=0.0325, min_points=80, print_progress=True))
-    object_idxs = list(set(cluster_idxs))
-    object_idxs.remove(-1)
+    cluster_idxs = list(all_objects.cluster_dbscan(eps=0.0325, min_points=80, print_progress=True))
+    obj_idxs = list(set(cluster_idxs))
+    obj_idxs.remove(-1)
 
-    number_of_objects = len(object_idxs)
+    number_of_objects = len(obj_idxs)
     print ('Number of objects: ' + str(number_of_objects))
 
     colormap = cm.Pastel1(list(range(0,number_of_objects)))
 
     # Objects on the table
+
     objects = []
-    for object_idx in object_idxs:
+    for obj_idx in obj_idxs:
 
-        object_point_idxs = list(locate(cluster_idxs, lambda x: x == object_idx))
+        obj_point_idxs = list(locate(cluster_idxs, lambda x: x == obj_idx))
 
-        object_points = outliers.select_by_index(object_point_idxs)
+        obj_points = all_objects.select_by_index(obj_point_idxs)
 
         # Create a dictionary to represent the objects
+
         d = {}
-        d['idx'] = str(object_idx)
-        d['points'] = object_points
-        d['color'] = colormap[object_idx, 0:3]
+        d['idx'] = str(obj_idx)
+        d['points'] = obj_points
+        d['color'] = colormap[obj_idx, 0:3]
         d['points'].paint_uniform_color(d['color'])
         d['center'] = d['points'].get_center()
 
@@ -175,11 +181,13 @@ def main():
     entities.append(frame)
 
     # Draw bbox
+
     bbox_to_draw = o3d.geometry.LineSet.create_from_axis_aligned_bounding_box(p.bbox)
     entities.append(bbox_to_draw)
 
     # Draw objects
-    for object_idx, object in enumerate(objects):
+
+    for obj_idx, object in enumerate(objects):
         entities.append(object['points'])
 
     # point_cloud_original = point_cloud_original.voxel_down_sample(voxel_size=0.02) 

@@ -28,7 +28,11 @@ class PointCloudProcessing():
         self.pcd = self.pcd.voxel_down_sample(voxel_size=voxel_size) 
         print('Downsampling reduced point cloud from  ' + str(len(self.original.points)) + ' to ' + str(len(self.pcd.points))+  ' points')
 
-        
+        # Estimate normals
+        self.pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.2, max_nn=30))
+        self.pcd.orient_normals_to_align_with_direction(orientation_reference=np.array([0., 0., 1.]))
+
+
     def transform(self, r,p,y,tx,ty,tz):
 
         # Convert from rad to deg
