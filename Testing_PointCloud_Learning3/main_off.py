@@ -41,7 +41,7 @@ def train(model, train_loader, val_loader=None,  epochs=5):
             print('Valid accuracy: %d %%' % val_acc)
 
         # save the model
-        torch.save(pointnet.state_dict(), "save.pth")
+        torch.save(pointnet.state_dict(), "models/save.pth")
 
 
 epochs = 10

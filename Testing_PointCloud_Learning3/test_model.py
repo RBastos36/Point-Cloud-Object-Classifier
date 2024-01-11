@@ -34,7 +34,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 pointnet = PointNet()
 pointnet.to(device)
-pointnet.load_state_dict(torch.load('save.pth'))
+pointnet.load_state_dict(torch.load('models/save.pth'))
 
 
 # pointnet.eval()
