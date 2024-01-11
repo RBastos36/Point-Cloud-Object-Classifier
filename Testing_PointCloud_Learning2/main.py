@@ -12,6 +12,8 @@ from torchmetrics.classification import MulticlassMatthewsCorrCoef
 import open3d as o3
 import json
 
+from dataset_pts import Dataset
+
 from open3d.web_visualizer import draw # for non Colab
 
 import matplotlib as mpl
@@ -25,7 +27,7 @@ warnings.filterwarnings("ignore")
 NUM_TRAIN_POINTS = 2500
 NUM_TEST_POINTS = 10000
 NUM_CLASSES = 5
-ROOT = r'data/objects_pcd'
+ROOT = r'data/objects_pts'
 
 # model hyperparameters
 GLOBAL_FEATS = 1024
@@ -55,11 +57,11 @@ CATEGORIES = {
 #     return colors
 
 
-with open('dataset_filenames_pcd.json', 'r') as f:
+with open('dataset_filenames_pts.json', 'r') as f:
     dataset_filenames = json.load(f)
 
 
-train_dataset = dataset_filenames['train_filenames']
+train_dataset = ["bowl_1_1_1.txt"]
 valid_dataset = dataset_filenames['validation_filenames']
 test_dataset = dataset_filenames['test_filenames']
 
@@ -67,37 +69,35 @@ test_dataset = dataset_filenames['test_filenames']
 from torch.utils.data import DataLoader
 
 # train Dataset & DataLoader
-train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+train_dataloader = DataLoader(dataset=Dataset(train_dataset), batch_size=BATCH_SIZE, shuffle=True)
 
-# Validation Dataset & DataLoader
-valid_dataloader = DataLoader(valid_dataset, batch_size=BATCH_SIZE)
+# # Validation Dataset & DataLoader
+# valid_dataloader = DataLoader(dataset=Dataset(valid_dataset), batch_size=BATCH_SIZE)
 
-# test Dataset & DataLoader 
-test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE)
+# # test Dataset & DataLoader 
+# test_dataloader = DataLoader(dataset=Dataset(test_dataset), batch_size=BATCH_SIZE)
 
 
 
 from point_net import PointNetClassHead
 
-points = next(iter(train_dataloader))
-
-# print(points)
-# print(len(points))
+points, targets = next(iter(train_dataloader))
 
 classifier = PointNetClassHead(k=NUM_CLASSES, num_global_feats=GLOBAL_FEATS)
-out, _, _ = classifier(points.transpose(2, 1))
-print(f'Class output shape: {out.shape}')
+# out, _, _ = classifier(points.transpose(2, 1))
+out, _, _ = classifier(((np.array(points)).T).tolist())
+# print(f'Class output shape: {out.shape}')
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-
+exit(0)
 
 
 import torch.optim as optim
 from point_net_loss import PointNetLoss
 
 EPOCHS = 100
-LR = 0.0001
+LR = 0.001
 REG_WEIGHT = 0.001 
 
 # use inverse class weighting
@@ -231,7 +231,7 @@ for epoch in range(1, EPOCHS):
     # save model if necessary
     if valid_metrics[-1][-1] >= best_mcc:
         best_mcc = valid_metrics[-1][-1]
-        torch.save(classifier.state_dict(), 'trained_models/cls_focal_clr_2/cls_model_%d.pth' % epoch)
+        torch.save(classifier.state_dict(), 'models/cls_model_%d.pth' % epoch)
 
 
 
