@@ -1,3 +1,5 @@
+from matplotlib import pyplot as plt
+from numpy import mean
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
@@ -6,9 +8,36 @@ from classes import *
 
 
 def train(model, train_loader, val_loader=None,  epochs=5):
+    
+    # Setup matplotlib figure
+    plt.figure(num='Training and Validating')
+    plt.title('Training and Validation Loss', fontweight="bold")
+    plt.axis([1, epochs, 0, 2])
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+
+    def draw(epoch_train_losses, epoch_validation_losses):
+        xs = range(1, len(epoch_train_losses)+1)
+        ys = epoch_train_losses
+        ys_validation = epoch_validation_losses
+
+        plt.plot(xs, ys, '-b')
+        plt.plot(xs, ys_validation, '-r')
+        plt.legend(['Training loss', 'Validation loss'])
+
+        # Draw figure
+        plt.draw()
+        pressed_key = plt.waitforbuttonpress(0.1)
+        if pressed_key == True:
+            exit(0)
+
+    epoch_train_losses = []
+    epoch_validation_losses = []
+
     for epoch in range(epochs):
+        draw(epoch_train_losses, epoch_validation_losses)
         pointnet.train()
-        running_loss = 0.0
+        batch_losses = []
         for i, data in enumerate(train_loader, 0):
             inputs, labels = data['pointcloud'].to(device).float(), data['category'].to(device)
             optimizer.zero_grad()
@@ -19,24 +48,31 @@ def train(model, train_loader, val_loader=None,  epochs=5):
             optimizer.step()
 
             # print statistics
-            running_loss += loss.item()
-            if i % 5 == 4:    # print every 10 mini-batches
-                print('[Epoch: %d, Batch: %4d / %4d], loss: %.3f' %
-                    (epoch + 1, i + 1, len(train_loader), running_loss / 10))
-                running_loss = 0.0
+            batch_losses.append(loss.data.item())
+            print('[Epoch: %d, Batch: %4d / %4d], loss: %.3f' %
+                (epoch + 1, i + 1, len(train_loader), loss))
 
         pointnet.eval()
         correct = total = 0
+        epoch_train_loss = mean(batch_losses)
+        epoch_train_losses.append(epoch_train_loss)
 
         # validation
         if val_loader:
+            batch_losses = []
             with torch.no_grad():
                 for data in val_loader:
                     inputs, labels = data['pointcloud'].to(device).float(), data['category'].to(device)
-                    outputs, __, __ = pointnet(inputs.transpose(1,2))
+                    outputs, m3x3, m64x64 = pointnet(inputs.transpose(1,2))
                     _, predicted = torch.max(outputs.data, 1)
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
+                    validation_loss = pointnetloss(outputs, labels, m3x3, m64x64)
+                    batch_losses.append(validation_loss.data.item())
+
+                epoch_validation_loss = mean(batch_losses)
+                epoch_validation_losses.append(epoch_validation_loss)
+
             val_acc = 100. * correct / total
             print('Valid accuracy: %d %%' % val_acc)
 
@@ -45,8 +81,8 @@ def train(model, train_loader, val_loader=None,  epochs=5):
 
 
 epochs = 10
-train_batch_size=32
-validation_batch_size=64
+train_batch_size = 10 #32
+validation_batch_size = 10 #64
 
 
 with open('dataset_filenames_off.json', 'r') as f:
@@ -55,8 +91,8 @@ with open('dataset_filenames_off.json', 'r') as f:
 train_filenames = dataset_filenames['train_filenames']
 validation_filenames = dataset_filenames['validation_filenames']
 
-train_filenames = train_filenames[0:500]                # NOTE: Change test file number to increase performance time
-validation_filenames = validation_filenames[0:200]      # NOTE: Change test file number to increase performance time
+train_filenames = train_filenames[0:50]                # NOTE: Change test file number to increase performance time
+validation_filenames = validation_filenames[0:20]      # NOTE: Change test file number to increase performance time
 
 
 classes = {"bowl": 0,
@@ -105,3 +141,5 @@ optimizer = torch.optim.Adam(pointnet.parameters(), lr=0.001)
 
 
 train(pointnet, train_loader, valid_loader, epochs)
+
+plt.show()
