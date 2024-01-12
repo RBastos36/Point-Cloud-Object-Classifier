@@ -217,6 +217,7 @@ def main():
     if len(object_files) < 1:
         raise FileNotFoundError('Dataset files not found')
     
+    
 
     for pcd_file_path in object_files:
 
