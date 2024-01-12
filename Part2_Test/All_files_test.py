@@ -169,12 +169,18 @@ def main():
 
     # Deleting existent .pcd in the folder
 
-    for file in glob.glob('Part2_Test/Objects_pcd/*'):
+    for file in glob.glob('Part2_Test/Objects_pcd/*.pcd'):
 
         os.remove(file)
     print('All files removed')
  
     # Objects on the table
+
+    classes = {"bowl": 0,
+           "cap": 1,
+           "cereal": 2,
+           "coffee": 3,
+           "soda": 4}
 
     objects = []
     for obj_idx in obj_idxs:
@@ -183,9 +189,28 @@ def main():
 
         obj_points = all_objects.select_by_index(obj_point_idxs)
 
+        entities = []
+        entities.append(obj_points)
 
-        o3d.io.write_point_cloud('Part2_Test/Objects_pcd/bowl_' + str(obj_idx + 1) + '.pcd', obj_points)
+        o3d.visualization.draw_geometries(entities,
+                                    zoom=view['trajectory'][0]['zoom'],
+                                    front=view['trajectory'][0]['front'],
+                                    lookat=view['trajectory'][0]['lookat'],
+                                    up=view['trajectory'][0]['up'])
 
+        print('Bowl = 0\nCap = 1\nCereal Box = 2\nCoffee mug = 3\nSoda can = 4\n')
+
+        while True:
+
+            gt_object = input('Insert object class: ')   # TODO make a pop-up or something because like this is not good 
+
+            if gt_object == '0' or gt_object == '1' or gt_object == '2' or gt_object == '3' or gt_object == '4':
+                break
+
+            else:
+                print('Invalid Input! Please try again.')
+
+        o3d.io.write_point_cloud('Part2_Test/Objects_pcd/' + list(classes.keys())[int(gt_object)] + '_' + str(obj_idx) + '.pcd', obj_points)
 
         # Create a dictionary to represent the objects
 
@@ -200,7 +225,7 @@ def main():
 
     # Deleting existent .off in the folder
 
-    for file in glob.glob('Part2_Test/Objects_off/*'):
+    for file in glob.glob('Part2_Test/Objects_off/*.off'):
 
         os.remove(file)
     print('All files removed')
