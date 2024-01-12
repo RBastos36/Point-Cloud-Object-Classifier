@@ -33,6 +33,22 @@ view = {
             "version_minor" : 0
         }
 
+def convert_pcd_to_off(pcd_file, off_file):
+    # Read PCD file
+    pcd = o3d.io.read_point_cloud(pcd_file)
+
+    # Downsample the point cloud (optional, but can be useful for large point clouds)
+    pcd = pcd.voxel_down_sample(voxel_size=0.005)
+
+    # Estimate normals for the point cloud
+    pcd.estimate_normals()
+
+    # Create a surface mesh using Poisson surface reconstruction
+    mesh, _ = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd)
+
+    # Save as OFF file
+    o3d.io.write_triangle_mesh(off_file, mesh)
+
 class PlaneDetection:
     def __init__(self, point_cloud):
 
@@ -151,12 +167,12 @@ def main():
 
     colormap = cm.Pastel1(list(range(0,number_of_objects)))
 
-    # Deleting existent pcd in the folder
+    # Deleting existent .pcd in the folder
 
     for file in glob.glob('Part2_Test/Objects_pcd/*'):
 
         os.remove(file)
-        print('All files removed')
+    print('All files removed')
  
     # Objects on the table
 
@@ -182,14 +198,32 @@ def main():
 
         objects.append(d)
 
+    # Deleting existent .off in the folder
+
+    for file in glob.glob('Part2_Test/Objects_off/*'):
+
+        os.remove(file)
+    print('All files removed')
 
 
+    # ----------------------------------------------------
+    # Converting .pcd to .off
+    # ----------------------------------------------------
 
+    # Get filenames of all images (including sub-folders)
+    object_files = glob.glob('Part2_Test/Objects_pcd/*.pcd')
 
+    # Check if dataset data exists
+    if len(object_files) < 1:
+        raise FileNotFoundError('Dataset files not found')
+    
 
+    for pcd_file_path in object_files:
 
+        off_file_name = ((os.path.basename(pcd_file_path)).split("."))[0]
+        off_file_path = "Part2_Test/Objects_off/" + off_file_name + '.off'
 
-
+        convert_pcd_to_off(pcd_file_path, off_file_path)
 
 
     # ------------------------------------------

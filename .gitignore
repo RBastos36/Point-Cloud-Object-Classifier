@@ -9,6 +9,7 @@ data/objects_pcd/*
 data/objects_pts/*
 data/objects_off/*
 Part2_Test/Objects_pcd/*
+Part2_Test/Objects_off/*
 !data/**/README.md
 
 
