@@ -8,6 +8,8 @@ import open3d.visualization.rendering as rendering
 from pcd_processing import PointCloudProcessing
 from matplotlib import cm
 from more_itertools import locate
+import os
+import glob
 
 
 # Default view
@@ -149,6 +151,13 @@ def main():
 
     colormap = cm.Pastel1(list(range(0,number_of_objects)))
 
+    # Deleting existent pcd in the folder
+
+    for file in glob.glob('Part2_Test/Objects_pcd/*'):
+
+        os.remove(file)
+        print('All files removed')
+ 
     # Objects on the table
 
     objects = []
@@ -157,6 +166,10 @@ def main():
         obj_point_idxs = list(locate(cluster_idxs, lambda x: x == obj_idx))
 
         obj_points = all_objects.select_by_index(obj_point_idxs)
+
+
+        o3d.io.write_point_cloud('Part2_Test/Objects_pcd/' + str(obj_idx + 1) + '.pcd', obj_points)
+
 
         # Create a dictionary to represent the objects
 
@@ -168,6 +181,16 @@ def main():
         d['center'] = d['points'].get_center()
 
         objects.append(d)
+
+
+
+
+
+
+
+
+
+
 
     # ------------------------------------------
     # Visualization
@@ -185,7 +208,7 @@ def main():
     bbox_to_draw = o3d.geometry.LineSet.create_from_axis_aligned_bounding_box(p.bbox)
     entities.append(bbox_to_draw)
 
-    # Draw objects
+    # Draw objects -----------------------------
 
     for obj_idx, object in enumerate(objects):
         entities.append(object['points'])
