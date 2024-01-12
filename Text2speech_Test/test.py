@@ -28,3 +28,4 @@ tts.save(file_name + '.mp3')
 
 os.system("play " + file_name + ".mp3"+" tempo 1.2")
 
+os.remove(file_name + '.mp3')
