@@ -4,6 +4,7 @@ import itertools
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
+from torchmetrics import Precision, Recall, F1Score
 from classes import PointNet, PointCloudData, default_transforms
 import json
 
@@ -39,7 +40,7 @@ pointnet.load_state_dict(torch.load('models/save.pth'))
 
 pointnet.eval()
 all_preds = []
-all_labels = []
+all_gt_labels = []
 with torch.no_grad():
     for i, data in enumerate(test_loader):
         print('Batch [%4d / %4d]' % (i+1, len(test_loader)))
@@ -48,11 +49,11 @@ with torch.no_grad():
         outputs, __, __ = pointnet(inputs.transpose(1,2))
         _, preds = torch.max(outputs.data, 1)
         all_preds += list(preds.numpy())
-        all_labels += list(labels.numpy())
+        all_gt_labels += list(labels.numpy())
 
 
 
-cm = confusion_matrix(all_labels, all_preds)
+cm = confusion_matrix(all_gt_labels, all_preds)
 
 
 
@@ -89,3 +90,28 @@ plt.show()
 plt.figure(figsize=(8,8))
 plot_confusion_matrix(cm, list(classes.keys()), normalize=False)
 plt.show()
+
+
+#--------------------------------------------------------------
+# Metrics -----------------------------------------------------
+#--------------------------------------------------------------
+
+all_preds_np = []
+all_gt_labels_np = []
+for i, j in zip(all_preds, all_gt_labels):
+    all_preds_np.append(i.item())
+    all_gt_labels_np.append(j.item())
+
+
+tensor_preds = torch.tensor(all_preds_np)
+tensor_gt_labels = torch.tensor(all_gt_labels_np)
+
+
+precision = Precision(task="multiclass", average='macro', num_classes=5)
+recall = Recall(task="multiclass", average='macro', num_classes=5)
+f1_score = F1Score(task="multiclass", num_classes=5)
+
+
+print("Precision: {:.1f}%".format(float((precision(tensor_preds, tensor_gt_labels)).item() * 100)))
+print("Recall: {:.1f}%".format(float((recall(tensor_preds, tensor_gt_labels)).item() * 100)))
+print("F1 Score: {:.1f}%".format(float((f1_score(tensor_preds, tensor_gt_labels)).item() * 100)))

@@ -198,7 +198,7 @@ def main():
                                     lookat=view['trajectory'][0]['lookat'],
                                     up=view['trajectory'][0]['up'])
 
-        print('Bowl = 0\nCap = 1\nCereal Box = 2\nCoffee mug = 3\nSoda can = 4\n')
+        print('\nBowl = 0\nCap = 1\nCereal Box = 2\nCoffee mug = 3\nSoda can = 4\n')
 
         while True:
 
