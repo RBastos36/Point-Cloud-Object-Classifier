@@ -4,7 +4,6 @@
 import math
 from copy import deepcopy
 import open3d as o3d
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm

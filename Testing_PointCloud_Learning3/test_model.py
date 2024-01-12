@@ -37,7 +37,7 @@ pointnet.to(device)
 pointnet.load_state_dict(torch.load('models/save.pth'))
 
 
-# pointnet.eval()
+pointnet.eval()
 all_preds = []
 all_labels = []
 with torch.no_grad():

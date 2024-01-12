@@ -87,7 +87,7 @@ def main():
 
     # Get scene datapath and load scene
 
-    datapath = 'data/scenes/pcd/05.pcd'
+    datapath = 'data/scenes/pcd/03.pcd'
     # datapath = 'data/scenes/pcd_new/05.pcd'
     # datapath = 'data/scenes/ply_original/05.ply'
     
@@ -184,7 +184,7 @@ def main():
         obj_points = all_objects.select_by_index(obj_point_idxs)
 
 
-        o3d.io.write_point_cloud('Part2_Test/Objects_pcd/' + str(obj_idx + 1) + '.pcd', obj_points)
+        o3d.io.write_point_cloud('Part2_Test/Objects_pcd/bowl_' + str(obj_idx + 1) + '.pcd', obj_points)
 
 
         # Create a dictionary to represent the objects
