@@ -235,7 +235,7 @@ def main():
 
     entities = []
 
-    frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=0.5, origin=np.array([0., 0., 0.]))
+    frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=0.3, origin=np.array([0., 0., 0.]))
     entities.append(frame)
 
     # Draw bbox
@@ -248,8 +248,8 @@ def main():
     for obj_idx, object in enumerate(objects):
         entities.append(object['points'])
 
-    # point_cloud_original = point_cloud_original.voxel_down_sample(voxel_size=0.02) 
-    # entities = [point_cloud_original]
+    # original_pcd = original_pcd.voxel_down_sample(voxel_size=0.02) 
+    # entities = [original_pcd]
 
     # frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=3.0, origin=np.array([0., 0., 0.]))
     # entities.append(frame)
