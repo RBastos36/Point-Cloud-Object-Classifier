@@ -8,6 +8,7 @@ import json
 try:
     from classes import *
 except ImportError:
+    # This happens when running from outside of this file
     from .classes import *
 
 
@@ -35,6 +36,7 @@ def trainModel(model_path, load_model=False):
             plt.draw()
             pressed_key = plt.waitforbuttonpress(1.0) # 1 second
             if pressed_key:
+                print('Train stopped by user!')
                 plt.close()
                 raise SystemExit
 
@@ -158,5 +160,4 @@ if __name__ == '__main__':
     try:
         trainModel(model_path='models/save.pth', load_model=False)
     except SystemExit:
-        print('Train stopped by user')
-        exit()
+        pass

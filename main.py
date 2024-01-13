@@ -3,6 +3,7 @@
 import tkinter as tk
 from PointCloud_Learning.dataset_splitter_off import splitDataset
 from PointCloud_Learning.main_off import trainModel
+from PointCloud_Learning.test_model import testModel
 
 
 def main():
@@ -15,17 +16,17 @@ def main():
         try:
             trainModel(model_path='models/save.pth', load_model=True)
         except SystemExit:
-            print('Train stopped by user')
+            pass
 
     def buttonNewTrain():
         print('Starting train from zero')
         try:
             trainModel(model_path='models/save.pth', load_model=False)
         except SystemExit:
-            print('Train stopped by user')
+            pass
 
     def buttonTestModel():
-        print('test model')
+        testModel(model_path='models/save.pth', file_count=20)
 
 
     window = tk.Tk()
