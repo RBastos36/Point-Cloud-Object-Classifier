@@ -1,6 +1,6 @@
 # SAVI - Trabalho Prático 2
 
-A brief description of your project.
+Sistemas Avançados de Visualização Industrial (SAVI) - Grupo 3 - Universidade de Aveiro - 2023/24
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ A brief description of your project.
 ---
 ## Introduction
 
-Provide a concise overview of your project. Explain its purpose, features, and any other relevant information.
+<p align="justify"> In this assignment, a point cloud based model was created and trained to guess objects displayed in different scenes, using the [Washington RGB-D Dataset](https://rgbd-dataset.cs.washington.edu/dataset/). This program needs to pre-process the scene to retrieve each object and its properties to feed the model, narrating the object prediction and its characteristics through a text-to-speech library. Furthermore, this model was also applied to a real-time system using a RGB-D camera.</p>
 
 
 ---
