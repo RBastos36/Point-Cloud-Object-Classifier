@@ -14,13 +14,13 @@ except ImportError:
     from .classes import PointNet, PointCloudData, default_transforms
 
 
-def testModel(model_path, file_count=200):  # 200 by default
+def testModel(model_path, file_count=200, batch_size=10):  # 200 / 10 by default
 
     with open('dataset_filenames_off.json', 'r') as f:
             dataset_filenames = json.load(f)
 
 
-    # Batch size is the same as file_count
+    # file_count can't be more than number of files. "0" means all files
     test_filenames = dataset_filenames['test_filenames']
 
     if file_count < 1:
@@ -29,13 +29,14 @@ def testModel(model_path, file_count=200):  # 200 by default
         file_count = min(len(test_filenames), file_count)
     test_filenames = test_filenames[0:file_count]
 
-    test_batch_size=len(test_filenames)
+    print(f"Testing with {file_count} files...")
 
-    print(f"Testing with {test_batch_size} files...")
 
+    # Batch size should not be bigger than total files
+    batch_size = min(batch_size, file_count)
 
     test_ds = PointCloudData(valid=True, filenames=test_filenames, transform=default_transforms)
-    test_loader = DataLoader(dataset=test_ds, batch_size=test_batch_size)
+    test_loader = DataLoader(dataset=test_ds, batch_size=batch_size)
 
 
     classes = {"bowl": 0,
@@ -132,5 +133,5 @@ def testModel(model_path, file_count=200):  # 200 by default
 
 
 if __name__ == '__main__':
-    testModel(model_path='models/save.pth', file_count=200)
+    testModel(model_path='models/save.pth')
 

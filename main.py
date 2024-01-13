@@ -26,35 +26,31 @@ def main():
             pass
 
     def buttonTestModel():
-        testModel(model_path='models/save.pth', file_count=20)
+        testModel(model_path='models/save.pth', file_count=100, batch_size=10)
 
 
     window = tk.Tk()
-    window.title("SAVI - Trabalho 2")
+    window.geometry("300x400")
     window.resizable(width=False, height=False)
+    window.title("SAVI - Trabalho 2")
 
-    button_frame = tk.Frame(window)
-    button_frame.pack(side=tk.LEFT, padx=10)
+    frame_train = tk.Frame(window)
+    frame_train.pack(side=tk.TOP, pady=10)
 
-    label = tk.Label(button_frame, text="Train Model", anchor="w", justify="left")
+    label = tk.Label(frame_train, text="Train Model", anchor="w", justify="left")
     label.pack()
 
-    button = tk.Button(button_frame, text="Split Dataset", command=buttonSplitDataset, width=15)
+    button = tk.Button(frame_train, text="Split Dataset", command=buttonSplitDataset, width=15)
     button.pack(pady=5)
 
-    button = tk.Button(button_frame, text="Continue Train", command=buttonContinueTrain, width=15)
+    button = tk.Button(frame_train, text="Continue Train", command=buttonContinueTrain, width=15)
     button.pack(pady=5)
 
-    button = tk.Button(button_frame, text="New Train", command=buttonNewTrain, width=15)
+    button = tk.Button(frame_train, text="New Train", command=buttonNewTrain, width=15)
     button.pack(pady=5)
 
-    button = tk.Button(button_frame, text="Test Model", command=buttonTestModel, width=15)
+    button = tk.Button(frame_train, text="Test Model", command=buttonTestModel, width=15)
     button.pack(pady=5)
-
-    text_area = tk.Text(window, height=10, width=30)
-    text_area.insert(tk.END, 'Text\ngoes\nhere')
-    text_area.pack(side=tk.RIGHT, padx=10, pady=10)
-    # text_area.config(state=tk.DISABLED)     # read-only
 
 
     # Start the main loop
