@@ -1,11 +1,16 @@
 
-
-
 import open3d as o3d
 from matplotlib import pyplot as plt
 
+# Link úteis -----------------------
 
+# https://www.open3d.org/docs/release/
+# https://www.open3d.org/docs/release/python_api/open3d.camera.html
+# https://medium.com/@ramazanilkera2/rgbd-to-3d-point-cloud-223b0a6f46db
+# https://www.open3d.org/docs/latest/tutorial/Basic/rgbd_image.html
+# https://github.com/PHANTOM0122/3D_Object_Reconstruction
 
+# ----------------------------------
 view = {
 	"class_name" : "ViewTrajectory",
 	"interval" : 29,
