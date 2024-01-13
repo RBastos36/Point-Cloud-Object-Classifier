@@ -5,9 +5,6 @@ import numpy as np
 import webcolors
 
 
-# TODO: try using cv2.projectPoints
-
-
 def getColorName(color):
 
     # Convert from 0-1 to 0-255
@@ -35,11 +32,11 @@ def getColorName(color):
 def main():
 
     # Load point cloud
-    pcd_file = 'cluster_4.pcd'
+    point_cloud = o3d.io.read_point_cloud('Part3/cluster_2.pcd')
+    if len(point_cloud.points) < 1:
+        exit('Dataset files not found')
 
-    point_cloud = o3d.io.read_point_cloud('Part3/'+pcd_file)
-    if len(point_cloud.points) < 1:     # Weird bug with VSCode, sometimes it uses the wrong path
-        point_cloud = o3d.io.read_point_cloud(pcd_file)
+    print(f'Loaded object with {len(point_cloud.points)} points')
 
 
     # Bounding box
@@ -66,14 +63,13 @@ def main():
 
 
     # Save image
-    image_array = np.asarray(vis.capture_screen_float_buffer())
-    vis.capture_screen_image("object.png")
+    # image_array = np.asarray(vis.capture_screen_float_buffer())
+    # vis.capture_screen_image("object.png")
 
 
     # Destroy window
     vis.destroy_window()
     print('Done!')
-    exit()
 
 
     # Test bbox
