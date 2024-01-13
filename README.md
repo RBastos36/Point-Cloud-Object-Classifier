@@ -69,16 +69,19 @@ To run the program and scripts presented in this repository, some libraries need
 ---
 ## Installation
 
-Provide step-by-step instructions on how to install and set up your project. Include any prerequisites that users need to have installed.
+To ensure the prgram runs as intended, the steps presented below should be followed.
 
+1. Clone the repository:
 ```bash
-# Clone the repository
-git clone [https://github.com/your-username/your-repo.git](https://github.com/Goncalo287/savi_t2/)
-
-# Change into the project directory
+git clone https://github.com/Goncalo287/savi_t2/
+```
+2. Change into the project directory:
+```bash
 cd savi_t2
-
-# Additional setup steps, if any
+```
+3. Run the program:
+```bash
+insert command to run program
 ```
 
 ---
