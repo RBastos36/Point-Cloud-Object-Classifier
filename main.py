@@ -2,22 +2,31 @@
 
 import tkinter as tk
 from PointCloud_Learning.dataset_splitter_off import splitDataset
-
-
-def buttonSplitDataset():
-    splitDataset()
-
-def buttonContinueTrain():
-    print('start train from checkpoint')
-
-def buttonNewTrain():
-    print('start train from 0')
-
-def buttonTestModel():
-    print('test model')
+from PointCloud_Learning.main_off import trainModel
 
 
 def main():
+
+    def buttonSplitDataset():
+        splitDataset()
+
+    def buttonContinueTrain():
+        print('Starting train from saved model')
+        try:
+            trainModel(model_path='models/save.pth', load_model=True)
+        except SystemExit:
+            print('Train stopped by user')
+
+    def buttonNewTrain():
+        print('Starting train from zero')
+        try:
+            trainModel(model_path='models/save.pth', load_model=False)
+        except SystemExit:
+            print('Train stopped by user')
+
+    def buttonTestModel():
+        print('test model')
+
 
     window = tk.Tk()
     window.title("SAVI - Trabalho 2")
