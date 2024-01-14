@@ -3,8 +3,6 @@
 import math
 import open3d as o3d
 import numpy as np
-import open3d.visualization.gui as gui
-import open3d.visualization.rendering as rendering
 from pcd_processing_testing import PointCloudProcessing
 from matplotlib import cm
 from more_itertools import locate
@@ -87,7 +85,7 @@ def main():
 
     # Get scene datapath and load scene
 
-    datapath = 'pcd/05.pcd'
+    datapath = 'Pre-processing_Testing/pcd/01.pcd'
     # datapath = 'data/scenes/pcd_new/05.pcd'
     # datapath = 'data/scenes/ply_original/05.ply'
     
@@ -276,8 +274,8 @@ def main():
         entities.append(object['points'])
     
 
-    # original_pcd = original_pcd.voxel_down_sample(voxel_size=0.02) 
-    # entities = [original_pcd]
+    # original_pcd = original_pcd.voxel_down_sample(voxel_size=0.03) 
+    # entities.append(original_pcd)
 
     # frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=3.0, origin=np.array([0., 0., 0.]))
     # entities.append(frame)
