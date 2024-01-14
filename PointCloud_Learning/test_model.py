@@ -141,7 +141,6 @@ def testModel(model_path, file_count=200, batch_size=10):  # 200 / 10 by default
 
     for i, precision in enumerate(new_classes_precision):
         print("Class '{}' Precicion: {:.1f}%\n".format(str(list(classes.keys())[list(classes.values()).index(i)]), (precision * 100)))
-        # print("Class '" + str(list(classes.keys())[list(classes.values()).index(i)]) + "' Precicion: " + str(precision * 100) + "%\n")
         
 
 if __name__ == '__main__':
