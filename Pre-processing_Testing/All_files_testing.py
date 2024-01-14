@@ -85,7 +85,7 @@ def main():
 
     # Get scene datapath and load scene
 
-    datapath = 'Pre-processing_Testing/pcd/01.pcd'
+    datapath = 'data/scenes/pcd/01.pcd'
     # datapath = 'data/scenes/pcd_new/05.pcd'
     # datapath = 'data/scenes/ply_original/05.ply'
     
