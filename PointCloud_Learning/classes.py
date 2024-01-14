@@ -118,7 +118,8 @@ class PointCloudData(Dataset):
                         "cap": 1,
                         "cereal": 2,
                         "coffee": 3,
-                        "soda": 4}
+                        "soda": 4,
+                        "object": -1}   # When unspecified
         self.transforms = transform if not valid else default_transforms()
         self.valid = valid
         self.files = []

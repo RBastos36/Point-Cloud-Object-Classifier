@@ -3,35 +3,18 @@
 import math
 import open3d as o3d
 import numpy as np
-import open3d.visualization.gui as gui
-import open3d.visualization.rendering as rendering
-from pcd_processing import PointCloudProcessing
+# import open3d.visualization.gui as gui
+# import open3d.visualization.rendering as rendering
 from matplotlib import cm
 from more_itertools import locate
 import os
 import glob
 
+try:
+    from pcd_processing import PointCloudProcessing
+except ImportError:
+    from .pcd_processing import PointCloudProcessing
 
-# Default view
-view = {
-            "class_name" : "ViewTrajectory",
-            "interval" : 29,
-            "is_loop" : False,
-            "trajectory" : 
-            [
-                {
-                    "boundingbox_max" : [ 0.69999999999999996, 0.69999999999999996, 0.5 ],
-                    "boundingbox_min" : [ -0.69999999999999996, -0.69999999999999996, -0.25 ],
-                    "field_of_view" : 60.0,
-                    "front" : [ 0.48357815199197129, 0.61548483867363935, 0.62235888704100151 ],
-                    "lookat" : [ 0.25470084286906458, 0.23151583259577294, 0.25384666908559167 ],
-                    "up" : [ -0.40379961065115821, -0.47397267466848536, 0.78249330866504885 ],
-                    "zoom" : 0.87999999999999901
-                }
-            ],
-            "version_major" : 1,
-            "version_minor" : 0
-        }
 
 def convert_pcd_to_off(pcd_file, off_file):
     # Read PCD file
@@ -74,23 +57,37 @@ class PlaneDetection:
         text = 'Segmented plane from pc with ' + str(len(self.point_cloud.points)) + ' with ' + str(len(self.inlier_cloud.points)) + ' inliers. '
         text += '\nPlane: ' + str(self.a) + ' x + ' + str(self.b) + ' y + ' + str(self.c) + ' z + ' + str(self.d) + ' = 0'
         return text
-    
 
-def main():
+
+def getObjects(datapath, ask_for_input=True):
+
+    # Default view
+    view = {
+        "class_name" : "ViewTrajectory",
+        "interval" : 29,
+        "is_loop" : False,
+        "trajectory" : 
+        [
+            {
+                "boundingbox_max" : [ 0.69999999999999996, 0.69999999999999996, 0.5 ],
+                "boundingbox_min" : [ -0.69999999999999996, -0.69999999999999996, -0.25 ],
+                "field_of_view" : 60.0,
+                "front" : [ 0.48357815199197129, 0.61548483867363935, 0.62235888704100151 ],
+                "lookat" : [ 0.25470084286906458, 0.23151583259577294, 0.25384666908559167 ],
+                "up" : [ -0.40379961065115821, -0.47397267466848536, 0.78249330866504885 ],
+                "zoom" : 0.87999999999999901
+            }
+        ],
+        "version_major" : 1,
+        "version_minor" : 0
+    }
+
 
     # ------------------------------------------
     # Initialization
     # ------------------------------------------
 
     p = PointCloudProcessing()
-
-
-    # Get scene datapath and load scene
-
-    datapath = 'data/scenes/pcd/03.pcd'
-    # datapath = 'data/scenes/pcd_new/05.pcd'
-    # datapath = 'data/scenes/ply_original/05.ply'
-    
     p.loadPointCloud(datapath)
     p.preProcess(voxel_size=0.009)
 
@@ -170,9 +167,8 @@ def main():
     # Deleting existent .pcd in the folder
 
     for file in glob.glob('Part2_Test/Objects_pcd/*.pcd'):
-
         os.remove(file)
-    print('All files removed')
+    print('Temporary .pcd files removed')
  
     # Objects on the table
 
@@ -189,28 +185,36 @@ def main():
 
         obj_points = all_objects.select_by_index(obj_point_idxs)
 
-        entities = []
-        entities.append(obj_points)
+        if ask_for_input:
 
-        o3d.visualization.draw_geometries(entities,
-                                    zoom=view['trajectory'][0]['zoom'],
-                                    front=view['trajectory'][0]['front'],
-                                    lookat=view['trajectory'][0]['lookat'],
-                                    up=view['trajectory'][0]['up'])
+            entities = []
+            entities.append(obj_points)
 
-        print('\nBowl = 0\nCap = 1\nCereal Box = 2\nCoffee mug = 3\nSoda can = 4\n')
+            o3d.visualization.draw_geometries(entities,
+                                        zoom=view['trajectory'][0]['zoom'],
+                                        front=view['trajectory'][0]['front'],
+                                        lookat=view['trajectory'][0]['lookat'],
+                                        up=view['trajectory'][0]['up'])
 
-        while True:
+            print('\nBowl = 0\nCap = 1\nCereal Box = 2\nCoffee mug = 3\nSoda can = 4\n')
 
-            gt_object = input('Insert object class: ')   # TODO make a pop-up or something because like this is not good 
+            while True:
 
-            if gt_object == '0' or gt_object == '1' or gt_object == '2' or gt_object == '3' or gt_object == '4':
-                break
+                gt_object = input('Insert object class: ')   # TODO make a pop-up or something because like this is not good 
 
-            else:
-                print('Invalid Input! Please try again.')
+                if gt_object == '0' or gt_object == '1' or gt_object == '2' or gt_object == '3' or gt_object == '4':
+                    break
 
-        o3d.io.write_point_cloud('Part2_Test/Objects_pcd/' + list(classes.keys())[int(gt_object)] + '_' + str(obj_idx) + '.pcd', obj_points)
+                else:
+                    print('Invalid Input! Please try again.')
+
+            object_name = list(classes.keys())[int(gt_object)]
+
+        else:
+            object_name = 'object'
+
+        o3d.io.write_point_cloud(f'Part2_Test/Objects_pcd/{object_name}_{obj_idx}.pcd' , obj_points)
+
 
         # Create a dictionary to represent the objects
 
@@ -218,7 +222,7 @@ def main():
         d['idx'] = str(obj_idx)
         d['points'] = obj_points
         d['color'] = colormap[obj_idx, 0:3]
-        d['points'].paint_uniform_color(d['color'])
+        # d['points'].paint_uniform_color(d['color'])
         d['center'] = d['points'].get_center()
 
         objects.append(d)
@@ -226,9 +230,8 @@ def main():
     # Deleting existent .off in the folder
 
     for file in glob.glob('Part2_Test/Objects_off/*.off'):
-
         os.remove(file)
-    print('All files removed')
+    print('Temporary .off files removed')
 
 
     # ----------------------------------------------------
@@ -251,39 +254,52 @@ def main():
 
         convert_pcd_to_off(pcd_file_path, off_file_path)
 
+    print('Saved objects in .off files')
+
 
     # ------------------------------------------
     # Visualization
     # ------------------------------------------
+    if ask_for_input:
+        
+        # Create a list of entities to draw --------
 
-    # Create a list of entities to draw --------
+        entities = []
 
-    entities = []
+        frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=0.3, origin=np.array([0., 0., 0.]))
+        entities.append(frame)
 
-    frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=0.3, origin=np.array([0., 0., 0.]))
-    entities.append(frame)
+        # Draw bbox
 
-    # Draw bbox
+        bbox_to_draw = o3d.geometry.LineSet.create_from_axis_aligned_bounding_box(p.bbox)
+        entities.append(bbox_to_draw)
 
-    bbox_to_draw = o3d.geometry.LineSet.create_from_axis_aligned_bounding_box(p.bbox)
-    entities.append(bbox_to_draw)
+        # Draw objects -----------------------------
 
-    # Draw objects -----------------------------
+        for obj_idx, object in enumerate(objects):
+            entities.append(object['points'])
 
-    for obj_idx, object in enumerate(objects):
-        entities.append(object['points'])
+        # original_pcd = original_pcd.voxel_down_sample(voxel_size=0.02) 
+        # entities = [original_pcd]
 
-    # original_pcd = original_pcd.voxel_down_sample(voxel_size=0.02) 
-    # entities = [original_pcd]
+        # frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=3.0, origin=np.array([0., 0., 0.]))
+        # entities.append(frame)
 
-    # frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=3.0, origin=np.array([0., 0., 0.]))
-    # entities.append(frame)
+        o3d.visualization.draw_geometries(entities,
+                                        zoom=view['trajectory'][0]['zoom'],
+                                        front=view['trajectory'][0]['front'],
+                                        lookat=view['trajectory'][0]['lookat'],
+                                        up=view['trajectory'][0]['up'])
 
-    o3d.visualization.draw_geometries(entities,
-                                    zoom=view['trajectory'][0]['zoom'],
-                                    front=view['trajectory'][0]['front'],
-                                    lookat=view['trajectory'][0]['lookat'],
-                                    up=view['trajectory'][0]['up'])
+    return objects
+
 
 if __name__ == "__main__":
-    main()
+
+    # Get scene datapath and load scene
+
+    datapath = 'data/scenes/pcd/03.pcd'
+    # datapath = 'data/scenes/pcd_new/05.pcd'
+    # datapath = 'data/scenes/ply_original/05.ply'
+
+    getObjects(datapath)
