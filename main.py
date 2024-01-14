@@ -7,6 +7,9 @@ import os
 import json
 import numpy as np
 import webcolors
+import open3d as o3d
+from PIL import Image, ImageTk
+import cv2
 
 from PointCloud_Learning.dataset_splitter_off import splitDataset
 from PointCloud_Learning.main_off import trainModel
@@ -18,7 +21,7 @@ from PointCloud_Learning.scene_object_identifier import classifyObjects
 def getAverageColorName(point_cloud):
 
     colors = np.asarray(point_cloud.colors)
-    color = np.mean(colors, axis=0)
+    color = np.average(colors, axis=0)
 
     # Convert from 0-1 to 0-255
     color = (color * 255).astype(int)
@@ -42,7 +45,7 @@ def getAverageColorName(point_cloud):
     return color_name.capitalize()
 
 
-def getObjectDimentions(point_cloud):
+def getObjectHeight(point_cloud):
 
     # There is more than one way of getting the BBOX - Choose the one with the best results
 
@@ -57,7 +60,71 @@ def getObjectDimentions(point_cloud):
     return f"{height} mm"
 
 
+def getImageFromPoints(point_cloud):
 
+    # Get image_array of the point cloud
+    vis = o3d.visualization.Visualizer()
+    vis.create_window(visible=False)
+    vis.add_geometry(point_cloud)
+    render_options = vis.get_render_option()
+
+    render_options.point_size = 50
+
+    vis.poll_events()
+    vis.update_renderer()
+    image_array = np.asarray(vis.capture_screen_float_buffer())
+    vis.destroy_window()
+
+
+    # Crop & resize image
+    height, width, _ = image_array.shape
+    min_dim = min(height, width)
+    start_row = (height - min_dim) // 2
+    start_col = (width - min_dim) // 2
+    cropped_image = image_array[start_row:start_row + min_dim, start_col:start_col + min_dim, :]
+    resized_image = cv2.resize(cropped_image, (150, 150))
+    # image_pil = Image.fromarray((resized_image * 255).astype(np.uint8))
+
+    return resized_image
+
+
+def openResultsWindow(objects):
+
+    # TODO: try replacing opencv window with tkinter top window
+
+    white_row = np.ones((objects[0]['image'].shape[0], 300, 3), dtype=np.uint8) * 255
+    image_rows = []
+    font = cv2.FONT_HERSHEY_SIMPLEX
+
+    for i, obj in enumerate(objects):
+        image = np.hstack([obj['image'], white_row])
+
+        image = cv2.putText(image, obj['label'], (175, 50), font, 1, (0,0,0), 2, cv2.LINE_AA)
+        image = cv2.putText(image, 'Color: '+obj['color'], (175, 90), font, 0.7, (0,0,0), 1, cv2.LINE_AA)
+        image = cv2.putText(image, 'Height: '+obj['height'], (175, 120), font, 0.7, (0,0,0), 1, cv2.LINE_AA)
+
+        image_rows.append(image)
+
+    image = np.vstack(image_rows)
+    cv2.imshow('Results', image)
+
+    while True:
+        if cv2.waitKey(50) == 27:   # ESC
+            break
+
+        # Close with X button
+        elif cv2.getWindowProperty('Results', cv2.WND_PROP_VISIBLE) < 1:
+            break
+
+    cv2.destroyAllWindows()
+
+
+
+# Global variables
+root = tk.Tk()
+
+
+# Main loop
 def main():
 
     def buttonSplitDataset():
@@ -98,18 +165,13 @@ def main():
         for i, obj in enumerate(objects):
             if int(obj['idx']) == i:
                 obj['label'] = predicted_labels[i]
-            obj['color'] = getAverageColorName(obj['points'])
-            obj['height'] = getObjectDimentions(obj['points'])
-            
 
-            # Temporary - these don't work with JSON
-            del obj['points']
-            del obj['center']
+            obj['color'] = getAverageColorName(obj['points'])
+            obj['height'] = getObjectHeight(obj['points'])
+            obj['image'] = getImageFromPoints(obj['points'])
 
         # Display results
-        print(json.dumps(objects, indent=4))
-
-        # TODO: open a new window with an image of each point cloud + information
+        openResultsWindow(objects)
 
 
     def buttonOpenCamera():
@@ -125,7 +187,6 @@ def main():
 
 
     # Create base structure: small window with 2 columns (frames)
-    root = tk.Tk()
     root.title("SAVI - Trabalho 2")
     # root.geometry("400x300")
     root.resizable(width=False, height=False)
@@ -178,7 +239,7 @@ def main():
 
 
     # Start the main loop
-    root.mainloop()
+    tk.mainloop()
 
 
 
