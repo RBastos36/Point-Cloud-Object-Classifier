@@ -8,7 +8,7 @@ import json
 import numpy as np
 import webcolors
 import open3d as o3d
-from PIL import Image, ImageTk
+# from PIL import Image, ImageTk
 import cv2
 
 from PointCloud_Learning.dataset_splitter_off import splitDataset
@@ -83,9 +83,11 @@ def getImageFromPoints(point_cloud):
     start_col = (width - min_dim) // 2
     cropped_image = image_array[start_row:start_row + min_dim, start_col:start_col + min_dim, :]
     resized_image = cv2.resize(cropped_image, (150, 150))
+    blur_image = cv2.GaussianBlur(resized_image, (5,5), 0)
+
     # image_pil = Image.fromarray((resized_image * 255).astype(np.uint8))
 
-    return resized_image
+    return blur_image
 
 
 def openResultsWindow(objects):
@@ -134,7 +136,7 @@ def main():
     def buttonContinueTrain():
         print('Starting train from saved model')
         try:
-            trainModel(model_path='models/save.pth', load_model=True)
+            trainModel(model_path='models/'+model_name.get(), load_model=True)
         except SystemExit:
             pass
 
@@ -142,13 +144,13 @@ def main():
     def buttonNewTrain():
         print('Starting train from zero')
         try:
-            trainModel(model_path='models/save.pth', load_model=False)
+            trainModel(model_path='models/'+model_name.get(), load_model=False)
         except SystemExit:
             pass
 
 
     def buttonTestModel():
-        testModel(model_path='models/save.pth', file_count=100, batch_size=10)
+        testModel(model_path='models/'+model_name.get(), file_count=100, batch_size=10)
 
 
     def buttonOpenScene():
@@ -159,7 +161,7 @@ def main():
         objects = getObjects(scene_path, manual_inputs)
 
         # Classify objects that were saved as .off
-        predicted_labels = classifyObjects(manual_inputs)
+        predicted_labels = classifyObjects(model_path='models/'+model_name.get(), get_metrics=manual_inputs)
 
         # Update object information
         for i, obj in enumerate(objects):
@@ -202,6 +204,10 @@ def main():
     # Column 1: Train Model
     label = tk.Label(frame_train, text="Train Model")
     label.pack()
+
+    model_name = tk.Entry(frame_train, width=18)
+    model_name.insert(0, "save.pth")
+    model_name.pack(pady=5)
 
     button = tk.Button(frame_train, text="Split Dataset", command=buttonSplitDataset, width=15)
     button.pack(pady=5)

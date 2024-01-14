@@ -9,7 +9,7 @@ except ImportError:
     from .classes import PointNet, PointCloudData, default_transforms
 
 
-def classifyObjects(get_metrics=True):
+def classifyObjects(model_path, get_metrics=True):
     print("Beginning Object (from Scene) Classification ...")
 
 
@@ -32,7 +32,7 @@ def classifyObjects(get_metrics=True):
 
     pointnet = PointNet()
     pointnet.to(device)
-    pointnet.load_state_dict(torch.load('models/save.pth'))
+    pointnet.load_state_dict(torch.load(model_path))
 
 
     pointnet.eval()
@@ -98,4 +98,4 @@ def classifyObjects(get_metrics=True):
 
 
 if __name__ == "__main__":
-    classified_objects = classifyObjects()
+    classified_objects = classifyObjects(model_path="save.pth")
