@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from torchmetrics import Precision, Recall, F1Score
+from torchmetrics.classification import MulticlassPrecision
 import json
 
 try:
@@ -40,10 +41,10 @@ def testModel(model_path, file_count=200, batch_size=10):  # 200 / 10 by default
 
 
     classes = {"bowl": 0,
-            "cap": 1,
-            "cereal": 2,
-            "coffee": 3,
-            "soda": 4}
+                "cap": 1,
+                "cereal": 2,
+                "coffee": 3,
+                "soda": 4}
 
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -125,12 +126,23 @@ def testModel(model_path, file_count=200, batch_size=10):  # 200 / 10 by default
     precision = Precision(task="multiclass", average='macro', num_classes=5)
     recall = Recall(task="multiclass", average='macro', num_classes=5)
     f1_score = F1Score(task="multiclass", num_classes=5)
+    multiclass_precision = MulticlassPrecision(num_classes=5, average=None)
 
+    classes_precision = list(multiclass_precision(tensor_preds, tensor_gt_labels))
 
-    print("Precision: {:.1f}%".format(float((precision(tensor_preds, tensor_gt_labels)).item() * 100)))
+    print("\n------------------Metrics------------------")
+    print("\nPrecision: {:.1f}%".format(float((precision(tensor_preds, tensor_gt_labels)).item() * 100)))
     print("Recall: {:.1f}%".format(float((recall(tensor_preds, tensor_gt_labels)).item() * 100)))
-    print("F1 Score: {:.1f}%".format(float((f1_score(tensor_preds, tensor_gt_labels)).item() * 100)))
+    print("F1 Score: {:.1f}%\n".format(float((f1_score(tensor_preds, tensor_gt_labels)).item() * 100)))
 
+    new_classes_precision = []
+    for class_precision in  classes_precision:
+        new_classes_precision.append(float((class_precision).item()))
+
+    for i, precision in enumerate(new_classes_precision):
+        print("Class '{}' Precicion: {:.1f}%\n".format(str(list(classes.keys())[list(classes.values()).index(i)]), (precision * 100)))
+        # print("Class '" + str(list(classes.keys())[list(classes.values()).index(i)]) + "' Precicion: " + str(precision * 100) + "%\n")
+        
 
 if __name__ == '__main__':
     testModel(model_path='models/save.pth')
