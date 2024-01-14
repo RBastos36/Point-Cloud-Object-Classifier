@@ -97,13 +97,13 @@ def testModel(model_path, file_count=200, batch_size=10):  # 200 / 10 by default
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
 
-    plt.figure(figsize=(8,8))
+    plt.figure(figsize=(8,8), num='Normalized Confusion Matrix')
     plot_confusion_matrix(cm, list(classes.keys()), normalize=True)
     plt.show()
 
 
 
-    plt.figure(figsize=(8,8))
+    plt.figure(figsize=(8,8), num='Confusion Matrix')
     plot_confusion_matrix(cm, list(classes.keys()), normalize=False)
     plt.show()
 
