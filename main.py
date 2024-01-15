@@ -97,7 +97,7 @@ def voice(num_objs, str_list ,obj_max, height, color):
     
     file_name = 'Voice_file'
 
-    text = 'In this scene there are ' + str(num_objs) + 'objectss, ' + str_list + '. The tallest one is the ' + str(obj_max) + ', it it is ' + str(height) + ' mm tall and its color is ' + color + '.'
+    text = 'In this scene there are ' + str(num_objs) + 'objects, ' + str_list + '. The tallest one is the ' + str(obj_max) + ', it is ' + str(height) + ' mm tall and its color is ' + color + '.'
     language = 'en'
     tts = gTTS(text=text, lang=language, slow=False)
 
@@ -202,7 +202,7 @@ def main():
                         string = str(counts[idx]) + " " + name + "es "
                         string = str(counts[idx]) + " " + name + "es "
                     else:
-                        string = str(countss[idx]) + " " + name + "s "
+                        string = str(counts[idx]) + " " + name + "s "
 
             elif 0 < idx < (len(dif_objs) - 1):
                 if counts[idx] == 1:
