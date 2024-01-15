@@ -104,16 +104,16 @@ print("Hello, World!")
 These are the contributors who made this project possible:
 
 - **[Adriano Figueiredo](https://github.com/AdrianoFF10)**
-  - Informação:
+  - Information:
     - Email: adrianofigueiredo7@ua.pt
-    - Número Mecanográfico: 104192
+    - NMec: 104192
 
 - **[Gonçalo Anacleto](https://github.com/Goncalo287)**
-  - Informação:
+  - Information:
     - Email: goncalo.anacleto@ua.pt
-    - Número Mecanográfico: 93394
+    - NMec: 93394
 
 - **[Ricardo Bastos](https://github.com/RBastos36)**
-  - Informação:
+  - Information:
     - Email: r.bastos@ua.pt
-    - Número Mecanográfico: 103983
+    - NMec: 103983
