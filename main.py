@@ -97,7 +97,7 @@ def voice(num_objs, str_list ,obj_max, height, color):
     
     file_name = 'Voice_file'
 
-    text = 'In this scene there are ' + str(num_objs) + 'object, ' + str_list + '. The tallest one is the ' + str(obj_max) + ', is ' + str(height) + ' mm tall and its color is ' + color + '.'
+    text = 'In this scene there are ' + str(num_objs) + 'objects, ' + str_list + '. The tallest one is the ' + str(obj_max) + ', it is ' + str(height) + ' mm tall and its color is ' + color + '.'
     language = 'en'
     tts = gTTS(text=text, lang=language, slow=False)
 
@@ -132,7 +132,7 @@ def main():
 
 
     def buttonTestModel():
-        testModel(model_path='models/'+model_name.get(), file_count=100, batch_size=10)
+        testModel(model_path='models/'+model_name.get(), file_count=100, batch_size=10, metrics_averaging=str(metrics_variable.get()))
 
 
     def buttonOpenScene():
@@ -154,11 +154,11 @@ def main():
                 obj['label'] = predicted_labels[i]
                 obj_label = obj['label']
                 if obj_label == 'cereal':
-                    obj_label == 'cereal box'
+                    obj_label = 'cereal box'
                 elif obj_label == 'coffee':
-                    obj_label == ' coffee mug'
+                    obj_label = ' coffee mug'
                 elif obj_label == 'soda':
-                    obj_label == 'soda can'
+                    obj_label = 'soda can'
 
                 obj_labels.append(obj_label)
 
@@ -185,7 +185,7 @@ def main():
 
         string = ""
         for idx, name in enumerate(dif_objs):
-            if idx == (len(obj_labels))-1:
+            if idx == (len(dif_objs) - 1):
                 if counts[idx] == 1:
                     string = string + "and a " + name
                 else:
@@ -199,11 +199,11 @@ def main():
                     string = "a " + name
                 else:
                     if name == "cereal box":
-                        string = str(count[idx]) + " " + name + "es "
+                        string = str(counts[idx]) + " " + name + "es "
                     else:
-                        string = str(count[idx]) + " " + name + "s "
+                        string = str(counts[idx]) + " " + name + "s "
 
-            elif 0 < idx < (len(obj_labels)-1):
+            elif 0 < idx < (len(dif_objs)-1):
                 if counts[idx] == 1:
                     string = string + ", a " + name
                 else:
@@ -289,6 +289,16 @@ def main():
     button = tk.Button(frame_scenes, text="Open Camera", command=buttonOpenCamera, width=15)
     button.pack(pady=5)
 
+    # Radio button to choose between 'macro' and 'micro' averaging in precision and recall metrics
+    tk.Label(frame_scenes, text="Metrics Averaging:").pack()
+
+    metrics_variable = tk.StringVar(frame_scenes, "macro")
+
+    values = {"macro" : "macro", 
+              "micro" : "micro"}
+    
+    for (text, value) in values.items(): 
+        ttk.Radiobutton(frame_scenes, text = text, variable = metrics_variable, value = value).pack(pady=5)
 
 
     # Start the main loop

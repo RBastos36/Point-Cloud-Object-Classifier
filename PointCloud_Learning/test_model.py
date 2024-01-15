@@ -15,7 +15,7 @@ except ImportError:
     from .classes import PointNet, PointCloudData, default_transforms
 
 
-def testModel(model_path, file_count=200, batch_size=10):  # 200 / 10 by default
+def testModel(model_path, file_count=200, batch_size=10, metrics_averaging="macro"):  # 200 / 10 by default
 
     with open('dataset_filenames_off.json', 'r') as f:
             dataset_filenames = json.load(f)
@@ -123,16 +123,16 @@ def testModel(model_path, file_count=200, batch_size=10):  # 200 / 10 by default
     tensor_gt_labels = torch.tensor(all_gt_labels_np)
 
 
-    precision = Precision(task="multiclass", average='macro', num_classes=5)
-    recall = Recall(task="multiclass", average='macro', num_classes=5)
+    precision = Precision(task="multiclass", average=metrics_averaging, num_classes=5)
+    recall = Recall(task="multiclass", average=metrics_averaging, num_classes=5)
     f1_score = F1Score(task="multiclass", num_classes=5)
     multiclass_precision = MulticlassPrecision(num_classes=5, average=None)
 
     classes_precision = list(multiclass_precision(tensor_preds, tensor_gt_labels))
 
     print("\n------------------Metrics------------------")
-    print("\nPrecision: {:.1f}%".format(float((precision(tensor_preds, tensor_gt_labels)).item() * 100)))
-    print("Recall: {:.1f}%".format(float((recall(tensor_preds, tensor_gt_labels)).item() * 100)))
+    print("\n" + metrics_averaging.capitalize() + "-Averaging Precision: {:.1f}%".format(float((precision(tensor_preds, tensor_gt_labels)).item() * 100)))
+    print(metrics_averaging.capitalize() + "-Averaging Recall: {:.1f}%".format(float((recall(tensor_preds, tensor_gt_labels)).item() * 100)))
     print("F1 Score: {:.1f}%\n".format(float((f1_score(tensor_preds, tensor_gt_labels)).item() * 100)))
 
     new_classes_precision = []
