@@ -4,12 +4,11 @@ import tkinter as tk
 from tkinter import ttk
 import glob
 import os
-import json
 import numpy as np
 import webcolors
 import open3d as o3d
-# from PIL import Image, ImageTk
-import cv2
+from open3d.visualization import gui
+from open3d.visualization import rendering
 
 from PointCloud_Learning.dataset_splitter_off import splitDataset
 from PointCloud_Learning.main_off import trainModel
@@ -54,80 +53,45 @@ def getObjectHeight(point_cloud):
     # bbox = point_cloud.get_oriented_bounding_box()
 
     bbox_dim = bbox.get_max_bound() - bbox.get_min_bound()
-    height = bbox_dim[1]
-    height = round(height*1000)  # milimeters, rounded
+    height = bbox_dim[2]
+    height = round(height * 1000 * 0.9)  # milimeters, rounded
 
     return f"{height} mm"
 
 
-def getImageFromPoints(point_cloud):
-
-    # Get image_array of the point cloud
-    vis = o3d.visualization.Visualizer()
-    vis.create_window(visible=False)
-    vis.add_geometry(point_cloud)
-    render_options = vis.get_render_option()
-
-    render_options.point_size = 50
-
-    vis.poll_events()
-    vis.update_renderer()
-    image_array = np.asarray(vis.capture_screen_float_buffer())
-    vis.destroy_window()
-
-
-    # Crop & resize image
-    height, width, _ = image_array.shape
-    min_dim = min(height, width)
-    start_row = (height - min_dim) // 2
-    start_col = (width - min_dim) // 2
-    cropped_image = image_array[start_row:start_row + min_dim, start_col:start_col + min_dim, :]
-    resized_image = cv2.resize(cropped_image, (150, 150))
-    bgr_image = cv2.cvtColor(resized_image, cv2.COLOR_RGB2BGR)
-    blur_image = cv2.GaussianBlur(bgr_image, (5,5), 0)
-
-    # image_pil = Image.fromarray((resized_image * 255).astype(np.uint8))
-
-    return blur_image
-
-
 def openResultsWindow(objects):
 
-    # TODO: try replacing opencv window with tkinter top window
-
-    white_row = np.ones((objects[0]['image'].shape[0], 300, 3), dtype=np.uint8) * 255
-    image_rows = []
-    font = cv2.FONT_HERSHEY_SIMPLEX
+    # Initialize window
+    gui.Application.instance.initialize()
+    window = gui.Application.instance.create_window("Results", 1024, 768)   # 4x3
+    scene = gui.SceneWidget()
+    scene.scene = rendering.Open3DScene(window.renderer)
+    window.add_child(scene)
 
     for i, obj in enumerate(objects):
-        image = np.hstack([obj['image'], white_row])
 
-        image = cv2.putText(image, obj['label'], (175, 50), font, 1, (0,0,0), 2, cv2.LINE_AA)
-        image = cv2.putText(image, 'Color: '+obj['color'], (175, 90), font, 0.7, (0,0,0), 1, cv2.LINE_AA)
-        image = cv2.putText(image, 'Height: '+obj['height'], (175, 120), font, 0.7, (0,0,0), 1, cv2.LINE_AA)
+        # Add point cloud
+        point_cloud = obj['points']
+        scene.scene.add_geometry(f'object_{i}', point_cloud, rendering.MaterialRecord())
 
-        image_rows.append(image)
+        # Add bbox
+        bbox = point_cloud.get_minimal_oriented_bounding_box()
+        bbox.color = [0, 0, 0]  # colors from obj['color'] are too bright
+        scene.scene.add_geometry(f'bbox_{i}', bbox, rendering.MaterialRecord())
 
-    image = np.vstack(image_rows)
-    cv2.imshow('Results', image)
+        # Add label
+        label_pos = bbox.get_center()
+        label_pos[2] += 0.15
+        label_text = f"{obj['label']}\nColor: {obj['color_name']}\nHeight: {obj['height']}"
+        scene.add_3d_label(label_pos, label_text)
 
-    while True:
-        if cv2.waitKey(50) == 27:   # ESC
-            break
-
-        # Close with X button
-        elif cv2.getWindowProperty('Results', cv2.WND_PROP_VISIBLE) < 1:
-            break
-
-    cv2.destroyAllWindows()
-
-
-
-# Global variables
-root = tk.Tk()
+    # Run
+    scene_bounds = o3d.geometry.AxisAlignedBoundingBox([-0.5, -0.5, -0.5], [0.5, 0.5, 0.5])
+    scene.setup_camera(60, scene_bounds, [0, 0, 0])
+    gui.Application.instance.run()
 
 
-# Main loop
+
 def main():
 
     def buttonSplitDataset():
@@ -169,9 +133,8 @@ def main():
             if int(obj['idx']) == i:
                 obj['label'] = predicted_labels[i]
 
-            obj['color'] = getAverageColorName(obj['points'])
+            obj['color_name'] = getAverageColorName(obj['points'])
             obj['height'] = getObjectHeight(obj['points'])
-            obj['image'] = getImageFromPoints(obj['points'])
 
         # Display results
         openResultsWindow(objects)
@@ -190,6 +153,7 @@ def main():
 
 
     # Create base structure: small window with 2 columns (frames)
+    root = tk.Tk()
     root.title("SAVI - Trabalho 2")
     # root.geometry("400x300")
     root.resizable(width=False, height=False)
