@@ -164,7 +164,7 @@ def main():
 
             obj['color_name'] = getAverageColorName(obj['points'])
             color = obj['color_name']
-            colors.apped(color)
+            colors.append(color)
             obj['height'] = getObjectHeight(obj['points'])
             height = float(obj['height'].split(' ')[0])
             heights.append(height)
