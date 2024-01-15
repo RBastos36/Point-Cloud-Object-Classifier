@@ -69,7 +69,7 @@ To run the program and scripts presented in this repository, some libraries need
 ---
 ## Installation
 
-To ensure the prgram runs as intended, the steps presented below should be followed.
+To ensure the program runs as intended, the steps presented below should be followed.
 
 1. Clone the repository:
 ```bash
@@ -81,7 +81,7 @@ cd savi_t2
 ```
 3. Run the program:
 ```bash
-insert command to run program
+./main.py
 ```
 
 ---
