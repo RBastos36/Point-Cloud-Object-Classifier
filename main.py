@@ -183,20 +183,19 @@ def main():
             count = obj_labels.count(obj)
             counts.append(count)
 
-
         string = ""
-        for idx, name in enumerate(obj_labels):
+        for idx, name in enumerate(dif_objs):
             if idx == (len(obj_labels))-1:
-                if count[idx] == 1:
+                if counts[idx] == 1:
                     string = string + "and a " + name
                 else:
                     if name == "cereal box":
-                        string = string + "and " + str(count) + ' ' + name + "es "
+                        string = string + "and " + str(counts[idx]) + ' ' + name + "es "
                     else:
-                        string = string + "and " + str(count) + ' ' + name + "s "
+                        string = string + "and " + str(counts[idx]) + ' ' + name + "s "
 
             elif idx == 0:
-                if count[idx] == 1:
+                if counts[idx] == 1:
                     string = "a " + name
                 else:
                     if name == "cereal box":
@@ -205,13 +204,13 @@ def main():
                         string = str(count[idx]) + " " + name + "s "
 
             elif 0 < idx < (len(obj_labels)-1):
-                if count[idx] == 1:
+                if counts[idx] == 1:
                     string = string + ", a " + name
                 else:
                     if name == "cereal box":
-                        string = string + ", " + count[idx] + " " + name + "es "
+                        string = string + ", " + str(counts[idx]) + " " + name + "es "
                     else:
-                        string = string + ", " + count[idx] + " " + name + "s "
+                        string = string + ", " + str(counts[idx]) + " " + name + "s "
                     
         
         thread = threading.Thread(target=voice, args=(num_labels, string, label, max_height, max_color))
