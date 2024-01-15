@@ -7,6 +7,9 @@ import os
 import numpy as np
 import webcolors
 import open3d as o3d
+import threading
+
+from gtts import gTTS
 from open3d.visualization import gui
 from open3d.visualization import rendering
 
@@ -90,6 +93,20 @@ def openResultsWindow(objects):
     scene.setup_camera(60, scene_bounds, [0, 0, 0])
     gui.Application.instance.run()
 
+def voice(num_objs, str_list ,obj_max, height, color):
+    
+    file_name = 'Voice_file'
+
+    text = 'In this scene there are ' + str(num_objs) + 'object, ' + str_list + '. The tallest one is the ' + str(obj_max) + ', is ' + str(height) + ' mm tall and its color is ' + color + '.'
+    language = 'en'
+    tts = gTTS(text=text, lang=language, slow=False)
+
+    # Saving audio file
+    tts.save(file_name + '.mp3')
+    os.system("play " + file_name + ".mp3"+" tempo 1.2")
+
+    # Deleting audio file
+    os.remove(file_name + '.mp3')
 
 
 def main():
@@ -129,12 +146,78 @@ def main():
         predicted_labels = classifyObjects(model_path='models/'+model_name.get(), get_metrics=manual_inputs)
 
         # Update object information
+        heights = []
+        obj_labels = []
+        colors = []
         for i, obj in enumerate(objects):
             if int(obj['idx']) == i:
                 obj['label'] = predicted_labels[i]
+                obj_label = obj['label']
+                if obj_label == 'cereal':
+                    obj_label == 'cereal box'
+                elif obj_label == 'coffee':
+                    obj_label == ' coffee mug'
+                elif obj_label == 'soda':
+                    obj_label == 'soda can'
+
+                obj_labels.append(obj_label)
 
             obj['color_name'] = getAverageColorName(obj['points'])
+            color = obj['color_name']
+            colors.apped(color)
             obj['height'] = getObjectHeight(obj['points'])
+            height = float(obj['height'].split(' ')[0])
+            heights.append(height)
+
+        # Calling TTS ------------------
+        
+        max_height_idx = heights.index(max(heights))
+        label = obj_labels[max_height_idx]
+        max_height = heights[max_height_idx]
+        max_color = colors[max_height_idx]
+        num_labels = len(heights)
+
+        dif_objs = list(set(obj_labels))
+        counts = []
+        for obj in dif_objs:
+            count = obj_labels.count(obj)
+            counts.append(count)
+
+
+        string = ""
+        for idx, name in enumerate(obj_labels):
+            if idx == (len(obj_labels))-1:
+                if count[idx] == 1:
+                    string = string + "and a " + name
+                else:
+                    if name == "cereal box":
+                        string = string + "and " + str(count) + ' ' + name + "es "
+                    else:
+                        string = string + "and " + str(count) + ' ' + name + "s "
+
+            elif idx == 0:
+                if count[idx] == 1:
+                    string = "a " + name
+                else:
+                    if name == "cereal box":
+                        string = str(count[idx]) + " " + name + "es "
+                    else:
+                        string = str(count[idx]) + " " + name + "s "
+
+            elif 0 < idx < (len(obj_labels)-1):
+                if count[idx] == 1:
+                    string = string + ", a " + name
+                else:
+                    if name == "cereal box":
+                        string = string + ", " + count[idx] + " " + name + "es "
+                    else:
+                        string = string + ", " + count[idx] + " " + name + "s "
+                    
+        
+        thread = threading.Thread(target=voice, args=(num_labels, string, label, max_height, max_color))
+        thread.start()
+
+        # ------------------------------
 
         # Display results
         openResultsWindow(objects)
