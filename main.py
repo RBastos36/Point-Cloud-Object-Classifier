@@ -83,7 +83,8 @@ def getImageFromPoints(point_cloud):
     start_col = (width - min_dim) // 2
     cropped_image = image_array[start_row:start_row + min_dim, start_col:start_col + min_dim, :]
     resized_image = cv2.resize(cropped_image, (150, 150))
-    blur_image = cv2.GaussianBlur(resized_image, (5,5), 0)
+    bgr_image = cv2.cvtColor(resized_image, cv2.COLOR_RGB2BGR)
+    blur_image = cv2.GaussianBlur(bgr_image, (5,5), 0)
 
     # image_pil = Image.fromarray((resized_image * 255).astype(np.uint8))
 
