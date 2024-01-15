@@ -15,6 +15,9 @@ def classifyObjects(model_path, get_metrics=True):
 
     classification_filenames = glob.glob('Part2_Test/Objects_off/*.off', recursive=True)
 
+    # Sort filenames by the number at the end, assuming filenames always follow the 'object_1' format
+    classification_filenames = sorted(classification_filenames, key=lambda x: int(x.split('_')[-1].split('.')[0]))
+
     classification_batch_size=len(classification_filenames)
 
     classification_ds = PointCloudData(valid=True, filenames=classification_filenames, transform=default_transforms)
