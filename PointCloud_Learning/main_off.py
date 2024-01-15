@@ -84,9 +84,13 @@ def trainModel(model_path, load_model=False):
 
                 val_acc = 100. * correct / total
                 print('Valid accuracy: %d %%' % val_acc)
-
-            # save the model
-            torch.save(pointnet.state_dict(), model_path)
+            
+            if (len(epoch_validation_losses) <= 1) or (epoch_validation_losses[-1] == min(epoch_validation_losses)):
+                # save the model
+                torch.save(pointnet.state_dict(), model_path)
+                print("Model saved!")
+            else:
+                print("Model not saved to prevent Overfitting!")
 
 
     epochs = 10
