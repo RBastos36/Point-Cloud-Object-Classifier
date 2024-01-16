@@ -30,38 +30,47 @@ To train the aforementioned classifier, it was used the [Washington RGB-D Object
 To run the program and scripts presented in this repository, some libraries need to be installed beforehand. These are the following:
 
 - **[Open3D](https://www.open3d.org/)**
-  - <u>Description</u>: library that allows for rapid reading, manipulating and storing of 3D data, like point clouds.
-  - <u>Installation</u>:
+  - Description: library that allows for rapid reading, manipulating and storing of 3D data, like point clouds.
+  - Installation:
     ```bash
     pip install open3d
     ```
 
 - **[Torch](https://pytorch.org/)**
-  - <u>Description</u>: PyTorch, or just Torch, is a fully featured framework for building deep learning models, which is a type of machine learning that's commonly used in applications like image recognition and  processing.
-  - <u>Installation</u>:
+  - Description: PyTorch, or just Torch, is a fully featured framework for building deep learning models, which is a type of machine learning that's commonly used in applications like image recognition and  processing.
+  - Installation:
     ```bash
     pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
     ```
 
 - **[Torchmetrics](https://lightning.ai/docs/torchmetrics/stable/)**
-  - <u>Description</u>: this is a convenient library that allows to compute the performance of deep learning models in an iterative fashion.
-  - <u>Installation</u>:
+  - Description: this is a convenient library that allows to compute the performance of deep learning models in an iterative fashion.
+  - Installation:
     ```bash
     pip install torchmetrics
     ```
   
 - **[Torch_geometric](https://pytorch-geometric.readthedocs.io/en/latest/)**
-  - <u>Description</u>: library built upon PyTorch to easily write and train Graph Neural Networks (GNNs) for a wide range of applications related to structured data.
-  - <u>Installation</u>:
+  - Description: library built upon PyTorch to easily write and train Graph Neural Networks (GNNs) for a wide range of applications related to structured data.
+  - Installation:
     ```bash
     pip install torch_geometric
     ```
 
 - **[gTTS](https://gtts.readthedocs.io/en/latest/)**
-  - <u>Description</u>: Google Text-to-Speech (gTTS) is a library to interface with Google Translate's text-to-speech API that allows writing spoken mp3 data to a file, allowing for further audio manipulation.
-  - <u>Installation</u>:
+  - Description: Google Text-to-Speech (gTTS) is a library to interface with Google Translate's text-to-speech API that allows writing spoken mp3 data to a file, allowing for further audio manipulation. Adittional packages such as [LibSoX and SoX](https://packages.debian.org/sid/libsox-fmt-all) are needed to help with sound processing.
+  - Installation:
     ```bash
     pip install gTTS
+    ```
+     ```bash
+    sudo apt-get update
+    ```
+      ```bash
+    sudo apt-get install sox
+    ```
+       ```bash
+    sudo apt-get install libsox-fmt-all
     ```
 
 <!-- Add more libraries as needed -->
@@ -94,6 +103,11 @@ To train the model with Pointclouds information, a [PointNet](http://stanford.ed
 
 To optimize the classifier parameters, a PointNetLoss function was implemented. In this function, the [Negative Log Likelihood Loss (NLLLOSS)](https://pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html) criterion was used to refine the model parameters during the training phase to improve validation results. To prevent overfitting during the training phase, the model was only saved when the validation error was minimum compared to the training process.
 
+```python3
+def pointnetloss(outputs, labels, m3x3, m64x64, alpha = 0.0001):
+    criterion = torch.nn.NLLLoss()
+```
+
 </details>
 
 <details >
@@ -103,6 +117,12 @@ aaa
 
 </details>
 
+<details >
+<summary><b>Real Time System</b></summary>
+
+aaa
+
+</details>
 
 ---
 ## Authors
