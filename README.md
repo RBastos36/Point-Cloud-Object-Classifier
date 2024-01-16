@@ -9,6 +9,7 @@ Sistemas Avançados de Visualização Industrial (SAVI) - Grupo 3 - Universidade
 * [Libraries Used](#libraries-used)
 * [Installation](#installation)
 * [Code Explanation](#code-explanation)
+* [Results](#results)
 * [Authors](#authors)
 
 
@@ -23,6 +24,8 @@ Sistemas Avançados de Visualização Industrial (SAVI) - Grupo 3 - Universidade
 To train the aforementioned classifier, it was used the [Washington RGB-D Object Dataset](https://rgbd-dataset.cs.washington.edu/dataset/). Therefore, it was used:
 - [RGB-D Object Dataset](https://rgbd-dataset.cs.washington.edu/dataset/rgbd-dataset_pcd_ascii/) - this is a point cloud dataset of each object used to train the model;
 - [RGB-D Scenes Dataset V2](https://rgbd-dataset.cs.washington.edu/dataset/rgbd-scenes-v2/) - this a point cloud dataset of each scene, where each object to test the model was retrieved.
+
+To develop this project, a dataset splitter was used to divide the dataset files into training, validation, and testing sets. In order to prevent the model predictions from becoming biased, objects for testing were selected manually. This decision was made because, within each dataset folder, the object is the same. This division can be found in the [README file in the data folder](data/objects_off/README.md).
 
 ---
 ## Libraries Used
@@ -113,7 +116,15 @@ def pointnetloss(outputs, labels, m3x3, m64x64, alpha = 0.0001):
 <details >
 <summary><b>Scene Preprocessing</b></summary>
 
-aaa
+To feed the classifier mentioned earlier, it is necessary to isolate the objects present in each scene. For this purpose, a script based on [Open3D](https://www.open3d.org/docs/release/) was developed to achieve the desired outcome for all scenes in an automated manner. Initially, the script detected the table, consisting solely of horizontal points. Subsequently, all points above the table, representing the objects, were retrieved. Finally, the points were grouped into clusters, where each cluster represents an object.
+
+```python3
+cluster_idxs = list(all_objects.cluster_dbscan(eps=0.031, min_points=70, print_progress=True))
+obj_idxs = list(set(cluster_idxs))
+obj_idxs.remove(-1)    # removing all other points
+```
+
+Additionally, properties of the objects were extracted, including color and height. These properties, along with the number and type of objects, were provided to the user through a text-to-speech script. Simultaneously, using [threading](https://docs.python.org/3/library/threading.html), a new window appeared displaying the objects and their respective data.
 
 </details>
 
@@ -123,6 +134,11 @@ aaa
 aaa
 
 </details>
+
+---
+## Results
+
+<p align="justify">Explain and show metrics. Show final image with objects and labels</p>
 
 ---
 ## Authors
