@@ -25,7 +25,7 @@ To train the aforementioned classifier, it was used the [Washington RGB-D Object
 - [RGB-D Object Dataset](https://rgbd-dataset.cs.washington.edu/dataset/rgbd-dataset_pcd_ascii/) - this is a point cloud dataset of each object used to train the model;
 - [RGB-D Scenes Dataset V2](https://rgbd-dataset.cs.washington.edu/dataset/rgbd-scenes-v2/) - this a point cloud dataset of each scene, where each object to test the model was retrieved.
 
-To develop this project, a dataset splitter was used to divide the dataset files into training, validation, and testing sets. In order to prevent the model predictions from becoming biased, objects for testing were selected manually. This decision was made because, within each dataset folder, the object is the same. This division can be found in the [README file in the data folder](data/objects_off/README.md).
+To develop this project, a dataset splitter was used to divide the dataset files into training, validation, and testing sets. In order to prevent the model predictions from becoming biased, objects for testing were selected manually. This decision was made because, within each dataset folder, the object is the same. This division can be found in the used [Dataset Splitter](PointCloud_Learning/dataset_splitter_off.py).
 
 ---
 ## Libraries Used
