@@ -166,7 +166,7 @@ def getObjects(datapath, ask_for_input=True):
 
     # Deleting existent .pcd in the folder
 
-    for file in glob.glob('Part2_Test/Objects_pcd/*.pcd'):
+    for file in glob.glob('PreProcessing/Objects_pcd/*.pcd'):
         os.remove(file)
     print('Temporary .pcd files removed')
  
@@ -213,7 +213,7 @@ def getObjects(datapath, ask_for_input=True):
         else:
             object_name = 'object'
 
-        o3d.io.write_point_cloud(f'Part2_Test/Objects_pcd/{object_name}_{obj_idx}.pcd' , obj_points)
+        o3d.io.write_point_cloud(f'PreProcessing/Objects_pcd/{object_name}_{obj_idx}.pcd' , obj_points)
 
 
         # Create a dictionary to represent the objects
@@ -229,7 +229,7 @@ def getObjects(datapath, ask_for_input=True):
 
     # Deleting existent .off in the folder
 
-    for file in glob.glob('Part2_Test/Objects_off/*.off'):
+    for file in glob.glob('PreProcessing/Objects_off/*.off'):
         os.remove(file)
     print('Temporary .off files removed')
 
@@ -239,7 +239,7 @@ def getObjects(datapath, ask_for_input=True):
     # ----------------------------------------------------
 
     # Get filenames of all images (including sub-folders)
-    object_files = glob.glob('Part2_Test/Objects_pcd/*.pcd')
+    object_files = glob.glob('PreProcessing/Objects_pcd/*.pcd')
 
     # Check if dataset data exists
     if len(object_files) < 1:
@@ -250,7 +250,7 @@ def getObjects(datapath, ask_for_input=True):
     for pcd_file_path in object_files:
 
         off_file_name = ((os.path.basename(pcd_file_path)).split("."))[0]
-        off_file_path = "Part2_Test/Objects_off/" + off_file_name + '.off'
+        off_file_path = "PreProcessing/Objects_off/" + off_file_name + '.off'
 
         convert_pcd_to_off(pcd_file_path, off_file_path)
 
