@@ -85,7 +85,7 @@ def main():
 
     # Get scene datapath and load scene
 
-    datapath = 'data/scenes/pcd/01.pcd'
+    datapath = 'data/scenes/pcd/14.pcd'
     # datapath = 'data/scenes/pcd_new/05.pcd'
     # datapath = 'data/scenes/ply_original/05.ply'
     
@@ -156,7 +156,7 @@ def main():
     # Clustering
     # ------------------------------------------------------
 
-    cluster_idxs = list(all_objects.cluster_dbscan(eps=0.031, min_points=70, print_progress=True))
+    cluster_idxs = list(all_objects.cluster_dbscan(eps=0.031, min_points=74, print_progress=True))
     obj_idxs = list(set(cluster_idxs))
     obj_idxs.remove(-1)
 
