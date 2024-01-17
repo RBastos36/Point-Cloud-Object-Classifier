@@ -51,7 +51,7 @@ def main():
     # -----------------------------------------------------------------
     # Prepare Datasets
     # -----------------------------------------------------------------
-    with open('dataset_filenames.json', 'r') as f:
+    with open('Image_Learning/dataset_filenames.json', 'r') as f:
         # Reading from json file
         dataset_filenames = json.load(f)
 

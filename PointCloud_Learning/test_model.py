@@ -17,7 +17,7 @@ except ImportError:
 
 def testModel(model_path, file_count=200, batch_size=10, metrics_averaging="macro"):  # 200 / 10 by default
 
-    with open('dataset_filenames_off.json', 'r') as f:
+    with open('PointCloud_Learning/dataset_filenames_off.json', 'r') as f:
             dataset_filenames = json.load(f)
 
 

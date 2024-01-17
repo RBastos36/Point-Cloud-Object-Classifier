@@ -16,7 +16,7 @@ from open3d.visualization import rendering
 from PointCloud_Learning.dataset_splitter_off import splitDataset
 from PointCloud_Learning.main_off import trainModel
 from PointCloud_Learning.test_model import testModel
-from Part2_Test.All_files_test import getObjects
+from PreProcessing.All_files_processing import getObjects
 from PointCloud_Learning.scene_object_identifier import classifyObjects
 
 
@@ -254,7 +254,7 @@ def main():
     label.pack()
 
     model_name = tk.Entry(frame_train, width=18)
-    model_name.insert(0, "save.pth")
+    model_name.insert(0, "save_8.pth")
     model_name.pack(pady=5)
 
     button = tk.Button(frame_train, text="Split Dataset", command=buttonSplitDataset, width=15)

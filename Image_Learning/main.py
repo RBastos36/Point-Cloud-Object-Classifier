@@ -25,7 +25,7 @@ def main():
     # -----------------------------------------------------------------
 
     # Reading from json file
-    with open('dataset_filenames.json', 'r') as f:
+    with open('Image_Learning/dataset_filenames.json', 'r') as f:
         dataset_filenames = json.load(f)
 
     train_filenames = dataset_filenames['train_filenames']

@@ -83,7 +83,7 @@ def splitDataset():
 
     # Save dictionary as a JSON file
     json_object = json.dumps(output_dict, indent=2)
-    with open('dataset_filenames_off.json', 'w') as f:
+    with open('PointCloud_Learning/dataset_filenames_off.json', 'w') as f:
         f.write(json_object)
 
 

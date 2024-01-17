@@ -98,7 +98,7 @@ def trainModel(model_path, load_model=False):
     validation_batch_size = 10 #64
 
 
-    with open('dataset_filenames_off.json', 'r') as f:
+    with open('PointCloud_Learning/dataset_filenames_off.json', 'r') as f:
             dataset_filenames = json.load(f)
 
     train_filenames = dataset_filenames['train_filenames']
