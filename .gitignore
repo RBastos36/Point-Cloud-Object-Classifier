@@ -8,8 +8,8 @@ data/objects/*
 data/objects_pcd/*
 data/objects_pts/*
 data/objects_off/*
-Part2_Test/Objects_pcd/*.pcd
-Part2_Test/Objects_off/*.off
+PreProcessing/Objects_pcd/*.pcd
+PreProcessing/Objects_off/*.off
 Pre-processing_Testing/pcd/*.pcd
 !data/**/README.md
 
