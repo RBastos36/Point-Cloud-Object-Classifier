@@ -138,7 +138,39 @@ aaa
 ---
 ## Results
 
-<p align="justify">Explain and show metrics. Show final image with objects and labels</p>
+<!-- <p align="justify">Explain and show metrics. Show final image with objects and labels</p> -->
+
+<details >
+<summary><b>Training Graph</b></summary>
+
+<p align="center">
+  <img src="your_relative_path_here" width="350" title="Training and Validation Loss during 15 epochs">
+  <img src="your_relative_path_here_number_2_large_name" width="350" alt="accessibility text">
+</p>
+
+As can be observed from the graph in Figure 1 (REFERÊNCIA), there is convergence in loss for both training and validation. The models were saved at the points of minimum validation loss to prevent overfitting, as mentioned earlier.
+
+In this training, 9000 samples were used for training and 3600 for validation over 15 epochs. A batch size of 32 for training and 64 for validation was considered (see table).
+
+The best model resulting from the training was from epoch 13, with a validation accuracy of 98%. However, after some testing, it was found that the model from epoch 8 proved to be the best for classifying objects in the scenes.
+
+</details>
+
+<details >
+<summary><b>Global and Class Metrics</b></summary>
+
+| Metrics | Value | Right-aligned |
+| :---:         |     :---:      |
+| Macro-Avering Precision   | 94.6%     | 
+| Macro-Avering Recall     | 95.5%       | 
+| F1 Score     | 94.9%       |
+| Class "bowl" Precision    | 95.6%       |
+| Class "cap" Precision      | 79.8%       |
+| Class "cereal box" Precision      | 100.0%       |
+| Class "coffee mug" Precision      | 100.0%      |
+| Class "soda can" Precision      | 97.5%       |
+
+</details>
 
 ---
 ## Authors
