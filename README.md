@@ -102,9 +102,9 @@ cd savi_t2
 <details >
 <summary><b>Training the model</b></summary>
 
-To train the model with Pointclouds information, a [PointNet](http://stanford.edu/~rqi/pointnet/) architecture was utilized. It consumes an entire point cloud, learns a spatial encoding of each point, aggregates learned encodings into features, and feeds them into a classifier. One advantage of this architecture is that it learns the global representation of the input, ensuring that the results are independent of the orientation of the Pointcloud. In this network architecture, there are several shared MLPs (1D Convolutions) from which critical points are extracted using a Max Pooling function. These critical points (outputs) are fed into a classifier that predicts each object class. Aditional detailed information about this architecture can be found at ["An Intuitive Introduction to Point Net"](https://medium.com/@itberrios6/introduction-to-point-net-d23f43aa87d2).
+To train the model with Pointclouds information, a [PointNet](http://stanford.edu/~rqi/pointnet/) architecture was utilized. It consumes an entire point cloud, learns a spatial encoding of each point, aggregates learned encodings into features and feeds them into a classifier. One advantage of this architecture is that it learns the global representation of the input, ensuring that the results are independent of the orientation of the Pointcloud. In this network architecture, there are several shared MLPs (1D Convolutions) from which critical points are extracted using a Max Pooling function. These critical points (outputs) are fed into a classifier that predicts each object class. Additional detailed information about this architecture can be found at ["An Intuitive Introduction to Point Net"](https://medium.com/@itberrios6/introduction-to-point-net-d23f43aa87d2).
 
-To optimize the classifier parameters, a PointNetLoss function was implemented. In this function, the [Negative Log Likelihood Loss (NLLLOSS)](https://pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html) criterion was used to refine the model parameters during the training phase to improve validation results. To prevent overfitting during the training phase, the model was only saved when the validation error was minimum compared to the training process.
+To optimize the classifier parameters, a PointNetLoss function was implemented. In this function, the [Negative Log Likelihood Loss (NLLLOSS)](https://pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html) criterion was used to refine the model parameters during the training phase to improve validation results. To prevent overfitting during the training phase, the model was only saved when the validation error was minimum compared to those saved during the training process.
 
 ```python3
 def pointnetloss(outputs, labels, m3x3, m64x64, alpha = 0.0001):
@@ -116,7 +116,7 @@ def pointnetloss(outputs, labels, m3x3, m64x64, alpha = 0.0001):
 <details >
 <summary><b>Scene Preprocessing</b></summary>
 
-To feed the classifier mentioned earlier, it is necessary to isolate the objects present in each scene. For this purpose, a script based on [Open3D](https://www.open3d.org/docs/release/) was developed to achieve the desired outcome for all scenes in an automated manner. Initially, the script detected the table, consisting solely of horizontal points. Subsequently, all points above the table, representing the objects, were retrieved. Finally, the points were grouped into clusters, where each cluster represents an object.
+To feed the classifier mentioned earlier, it is necessary to isolate the objects present in each scene. For this purpose, a script based on [Open3D](https://www.open3d.org/docs/release/) was developed to achieve the desired outcome for all scenes in an automated manner. Initially, the script detects the table, which consists solely of horizontal points. Subsequently, all points above the table, representing the objects, are retrieved. Finally, the points are grouped into clusters, where each cluster represents an object.
 
 ```python3
 cluster_idxs = list(all_objects.cluster_dbscan(eps=0.031, min_points=70, print_progress=True))
@@ -124,7 +124,7 @@ obj_idxs = list(set(cluster_idxs))
 obj_idxs.remove(-1)    # removing all other points
 ```
 
-Additionally, properties of the objects were extracted, including color and height. These properties, along with the number and type of objects, were provided to the user through a text-to-speech script. Simultaneously, using [threading](https://docs.python.org/3/library/threading.html), a new window appeared displaying the objects and their respective data.
+Additionally, properties of the objects are extracted, including color and height. These properties, along with the number and type of objects, are provided to the user through a text-to-speech script. Simultaneously, using [threading](https://docs.python.org/3/library/threading.html), a new window appears displaying the objects and their respective data.
 
 </details>
 
@@ -170,7 +170,7 @@ The best model resulting from the training was from epoch 13, with a validation 
 <details >
 <summary><b>Global and Class Metrics</b></summary>
 
-To evaluate the performance of the model generated, a test dataset was created, with 4136 files, to be fed to the model. To assess the model's quality, [performance metrics](https://towardsdatascience.com/a-look-at-precision-recall-and-f1-score-36b5fd0dd3ec) were calculated, yielding the following values for the model from epoch 8:
+To evaluate the performance of the model generated, a test dataset was created with 4136 files, to be fed to the model. To assess the model's quality, [performance metrics](https://towardsdatascience.com/a-look-at-precision-recall-and-f1-score-36b5fd0dd3ec) were calculated, yielding the following values for the model from epoch 8:
 
 | Metrics | Value |
 | :---:         |     :---:      |
@@ -197,7 +197,7 @@ After training the model and preprocessing the scene, each object can be passed 
 </p>
 
 <p align="center">
-<b>Figure 2</b> - Objects idetified in the scene, predicted labels and respective properties.
+<b>Figure 2</b> - Objects identified in the scene, predicted labels and respective properties.
 </p> 
 
 </details>
