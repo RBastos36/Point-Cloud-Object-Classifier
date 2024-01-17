@@ -187,12 +187,12 @@ def main():
         for idx, name in enumerate(dif_objs):
             if idx == (len(dif_objs) - 1):
                 if counts[idx] == 1:
-                    string = string + "and a " + name
+                    string = string + " and a " + name
                 else:
                     if name == "cereal box":
-                        string = string + "and " + str(counts[idx]) + ' ' + name + "es "
+                        string = string + " and " + str(counts[idx]) + ' ' + name + "es "
                     else:
-                        string = string + "and " + str(counts[idx]) + ' ' + name + "s "
+                        string = string + " and " + str(counts[idx]) + ' ' + name + "s "
 
             elif idx == 0:
                 if counts[idx] == 1:
