@@ -269,21 +269,21 @@ def main():
 	# Converting .pcd to .off
 	# ----------------------------------------------------
 
-	# # Get filenames of all images (including sub-folders)
-	# object_files = glob.glob('Part2_Test/Objects_pcd/*.pcd')
+	# Get filenames of all images (including sub-folders)
+	object_files = glob.glob('Part2_Test/Objects_pcd/*.pcd')
 
-	# # Check if dataset data exists
-	# if len(object_files) < 1:
-	# 	raise FileNotFoundError('Dataset files not found')
+	# Check if dataset data exists
+	if len(object_files) < 1:
+		raise FileNotFoundError('Dataset files not found')
 
 
 
-	# for pcd_file_path in object_files:
+	for pcd_file_path in object_files:
 
-	# 	off_file_name = ((os.path.basename(pcd_file_path)).split("."))[0]
-	# 	off_file_path = "Part2_Test/Objects_off/" + off_file_name + '.off'
+		off_file_name = ((os.path.basename(pcd_file_path)).split("."))[0]
+		off_file_path = "Part2_Test/Objects_off/" + off_file_name + '.off'
 
-	# 	convert_pcd_to_off(pcd_file_path, off_file_path)
+		convert_pcd_to_off(pcd_file_path, off_file_path)
 
 
 	# ------------------------------------------
