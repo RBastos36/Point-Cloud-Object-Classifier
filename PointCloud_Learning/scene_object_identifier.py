@@ -13,7 +13,7 @@ def classifyObjects(model_path, get_metrics=True):
     print("Beginning Object (from Scene) Classification ...")
 
 
-    classification_filenames = glob.glob('Part2_Test/Objects_off/*.off', recursive=True)
+    classification_filenames = glob.glob('PreProcessing/Objects_off/*.off', recursive=True)
 
     # Sort filenames by the number at the end, assuming filenames always follow the 'object_1' format
     classification_filenames = sorted(classification_filenames, key=lambda x: int(x.split('_')[-1].split('.')[0]))
