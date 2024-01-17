@@ -141,11 +141,11 @@ aaa
 <!-- <p align="justify">Explain and show metrics. Show final image with objects and labels</p> -->
 
 <details >
-<summary><b>Training Graph</b></summary>
+<summary><b>Training Parameters and Resulting Graph</b></summary>
 
-As can be observed from the graph in <b>Figure 1</b>, there is convergence in loss for both training and validation. The models were saved at the points of minimum validation loss to prevent overfitting, as mentioned earlier.
+<p align="justify">As can be observed from the graph in <b>Figure 1</b>, there is convergence in loss for both training and validation. The models were saved at the points of minimum validation loss to prevent overfitting, as mentioned earlier.</p>
 
-Before starting the training, the following parameters were considered based on several research articles:
+<p align="justify">Before starting the training, the following parameters were considered based on several research articles:</p>
 
 | Parameters | Value |
 | :---:         |     :---:      |
@@ -155,7 +155,7 @@ Before starting the training, the following parameters were considered based on 
 | Training Batch Size    | 32       |
 | Validation Batch Size      | 64       |
 
-The best model resulting from the training was from epoch 13, with a validation accuracy of 98%. However, after some testing, it was found that the model from epoch 8 proved to be the best for classifying objects in the scenes.
+<p align="justify">The best model resulting from the training was from epoch 13, with a validation accuracy of 98%. However, after some testing, it was found that the model from epoch 8 proved to be the best for classifying objects in the scenes.</p>
 
 <p align="center">
   <img src="Results/train_validation_loss_graphic_2_saved_15_epochs.png" alt="Alt text">
@@ -188,9 +188,9 @@ The global precision was calculated using 'macro' averaging, but the user can ch
 </details>
 
 <details >
-<summary><b>Scene Object Classification</b></summary>
+<summary><b>Scene Objects Classification</b></summary>
 
-After training the model and preprocessing the scene, each object can be passed through the model to output the predicted label. Finally, the final result can be shown in a results window, so that the user can evaluate all the information.
+<p align="justify">After training the model and preprocessing the scene, each object can be passed through the model to output the predicted label. Finally, the final result can be shown in a results window, so that the user can evaluate all the information.</p>
 
 <p align="center">
   <img src="Results/Scene_Objects_Classifier_Results.png" alt="Alt text">
