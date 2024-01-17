@@ -155,7 +155,7 @@ def getObjects(datapath, ask_for_input=True):
     # Clustering
     # ------------------------------------------------------
 
-    cluster_idxs = list(all_objects.cluster_dbscan(eps=0.031, min_points=70, print_progress=True))
+    cluster_idxs = list(all_objects.cluster_dbscan(eps=0.031, min_points=74, print_progress=True))
     obj_idxs = list(set(cluster_idxs))
     obj_idxs.remove(-1)
 
