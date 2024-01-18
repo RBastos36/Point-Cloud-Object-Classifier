@@ -55,7 +55,12 @@ def pcdFromCamera(camera_id):
             raise SystemExit
 
 
-        # Draw a crossair in the color image
+        # Convert to Open3D images
+        color_raw = o3d.geometry.Image(img_color)
+        depth_raw = o3d.geometry.Image((img_depth * 0.1).astype(np.uint16))     # Scaled down to 10%
+
+
+        # Draw a crossair in the opencv image
         center_x, center_y = img_color.shape[1] // 2, img_color.shape[0] // 2
         cv2.line(img_color, (center_x, center_y-20), (center_x, center_y+20), (0, 255, 0), 2)
         cv2.line(img_color, (center_x-20, center_y), (center_x+20, center_y), (0, 255, 0), 2)
@@ -81,11 +86,6 @@ def pcdFromCamera(camera_id):
     cap.release()
     openni2.unload()
     cv2.destroyAllWindows()
-
-
-    # Convert to Open3D images
-    color_raw = o3d.geometry.Image(img_color)
-    depth_raw = o3d.geometry.Image((img_depth * 0.1).astype(np.uint16))     # Scaled down to 10%
 
 
     # Create RGBDImage
