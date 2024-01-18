@@ -2,23 +2,32 @@
 import cv2
 import numpy as np
 import open3d as o3d
-from pcd_processing_P6 import PointCloudProcessing
 from openni import openni2
 from openni import _openni2 as c_api
+import tkinter as tk
+from tkinter import messagebox
+
+# from pcd_processing_P6 import PointCloudProcessing
 
 
-def main():
+
+def pcdFromCamera(camera_id):
 
     # Initialize the depth stream
-    openni2.initialize()
-    dev = openni2.Device.open_any()
+    try:
+        openni2.initialize()
+        dev = openni2.Device.open_any()
+    except Exception:
+        print('\nError: RGBD camera not found!')
+        raise SystemExit
+    
     depth_stream = dev.create_depth_stream()
     depth_stream.start()
     depth_stream.set_video_mode(c_api.OniVideoMode(pixelFormat = c_api.OniPixelFormat.ONI_PIXEL_FORMAT_DEPTH_100_UM, resolutionX = 640, resolutionY = 480, fps = 30))
 
 
     # Initialize OpenCV camera
-    cap = cv2.VideoCapture(2)
+    cap = cv2.VideoCapture(camera_id)
 
 
     # Initialize Open3D visualization window
@@ -30,6 +39,7 @@ def main():
 
 
     # Main loop
+    print('Opening camera... Press ESC to close windows and confirm scene')
     while vis.poll_events():
 
         # Depth image
@@ -105,6 +115,24 @@ def main():
         lookat=[0, 0, 1.5],
         up=[0, -1, 0])
 
+    return pcd
+
+
+def initCamera():
+    root = tk.Tk()
+    root.withdraw()
+
+    pcd = pcdFromCamera(2)
+    confirm = messagebox.askyesno("Confirmation", "Use this point cloud?")
+    root.destroy()
+
+    if confirm is False:
+        raise SystemExit
+
+    print('Use this PCD...')
+
+
+
 
 if __name__ == "__main__":
-    main()
+    initCamera()

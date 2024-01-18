@@ -18,6 +18,7 @@ from PointCloud_Learning.main_off import trainModel
 from PointCloud_Learning.test_model import testModel
 from PreProcessing.All_files_processing import getObjects
 from PointCloud_Learning.scene_object_identifier import classifyObjects
+from Part6.camera import initCamera
 
 
 def getAverageColorName(point_cloud):
@@ -224,8 +225,10 @@ def main():
 
 
     def buttonOpenCamera():
-        print('OPEN CAMERA')    # TODO
-
+        try:
+            initCamera()
+        except SystemExit:
+            pass
 
 
     # Get list of scenes
