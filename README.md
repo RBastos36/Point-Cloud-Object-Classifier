@@ -76,6 +76,14 @@ To run the program and scripts presented in this repository, some libraries need
     sudo apt-get install libsox-fmt-all
     ```
 
+- **[OpenNI 2](https://structure.io/openni/)**
+  - Description: This is optional and only required if you want to use the real-time object detection with an RGBD camera. The camera used was an "Astra Pro NL", for different cameras this implementation may be different.
+  - Installation:
+    - [Download the latest version](https://structure.io/openni/)
+    - [Follow this installation guide](https://astra-wiki.readthedocs.io/en/latest/installation.html#linux)
+
+    Note: at the time of writing this, the download link in the installation guide is broken, use the one provided here instead.
+
 <!-- Add more libraries as needed -->
 
 ---
@@ -131,7 +139,9 @@ Additionally, properties of the objects are extracted, including color and heigh
 <details >
 <summary><b>Real Time System</b></summary>
 
-aaa
+This part of the program uses the color and depth images from a connected RGBD camera (Asttra Pro NL). The depth image is obtained using `openni2` and displayed next to the color image in an `opencv` window. Here, the user can point the camera at the desired location and see the resulting images.
+
+When happy with the current images, the user can press Enter to confirm and exit the while loop. A point cloud is generated from the images obtained using `open3d`. This point cloud is then used as a scene to detect and classify objetcs.
 
 </details>
 
