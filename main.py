@@ -303,11 +303,6 @@ def main():
     model_name.insert(0, "save_8.pth")
     model_name.grid(row=0, column=1, pady=15)
 
-    status_label = tk.StringVar()
-    status_label.set("Welcome!")
-    label = tk.Label(root, textvariable=status_label)
-    label.grid(row=2, column=0, columnspan=2, pady=5)
-
 
     # Column 1: Train Model
     label = tk.Label(frame_train, text="Train Model")
