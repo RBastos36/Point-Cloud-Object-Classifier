@@ -97,6 +97,7 @@ def openResultsWindow(objects):
     scene.setup_camera(60, scene_bounds, [0, 0, 0])
     gui.Application.instance.run()
 
+
 def voice(num_objs, str_list ,obj_max, height, color, closest_to_center):
     
     file_name = 'Voice_file'
@@ -117,7 +118,9 @@ def voice(num_objs, str_list ,obj_max, height, color, closest_to_center):
     os.system("play " + file_name + ".mp3"+" tempo 1.2")
 
     # Deleting audio file
-    os.remove(file_name + '.mp3')
+    file_name += '.mp3'
+    if os.path.exists(file_name):
+        os.remove(file_name)
 
 
 def analyseScene(scene_path, model_path, manual_inputs, camera_image=False):
@@ -157,7 +160,6 @@ def analyseScene(scene_path, model_path, manual_inputs, camera_image=False):
         colors.append(color)
         obj['height'], obj['width'] = getObjectDimensions(obj['points'])
         obj['dist_to_center'] = np.linalg.norm(obj['center'] - np.array([0, 0, 0]))
-        print(obj['dist_to_center'])
 
         heights.append(obj['height'])
 
@@ -291,11 +293,27 @@ def main():
             "version_minor" : 0
         }
 
-        o3d.visualization.draw_geometries([pcd, origin],
-                                        zoom=view['trajectory'][0]['zoom'],
-                                        front=view['trajectory'][0]['front'],
-                                        lookat=view['trajectory'][0]['lookat'],
-                                        up=view['trajectory'][0]['up'])
+        gui.Application.instance.initialize()
+        window = gui.Application.instance.create_window("Open3D", 1024, 768)   # 4x3
+        scene = gui.SceneWidget()
+        scene.scene = rendering.Open3DScene(window.renderer)
+        window.add_child(scene)
+
+        scene.scene.add_geometry(f'pcd', pcd, rendering.MaterialRecord())
+        scene.scene.add_geometry(f'origin', origin, rendering.MaterialRecord())
+
+        scene.setup_camera(60, pcd.get_axis_aligned_bounding_box(), [0, 0, 0])
+
+        scene.look_at(np.array(view['trajectory'][0]['lookat'], dtype=np.float32),
+                    np.array(view['trajectory'][0]['front'], dtype=np.float32),
+                    np.array(view['trajectory'][0]['up'], dtype=np.float32))
+        gui.Application.instance.run()
+
+        # o3d.visualization.draw_geometries([pcd, origin],
+        #                                 zoom=view['trajectory'][0]['zoom'],
+        #                                 front=view['trajectory'][0]['front'],
+        #                                 lookat=view['trajectory'][0]['lookat'],
+        #                                 up=view['trajectory'][0]['up'])
 
 
     def buttonOpenCamera():

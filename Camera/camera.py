@@ -4,8 +4,8 @@ import numpy as np
 import os
 
 import open3d as o3d
-# from open3d.visualization import gui
-# from open3d.visualization import rendering
+from open3d.visualization import gui
+from open3d.visualization import rendering
 
 from openni import openni2
 from openni import _openni2 as c_api
@@ -107,11 +107,28 @@ def pcdFromCamera(camera_id):
 
 
     # Show the final PCD
-    o3d.visualization.draw_geometries([pcd, origin, bbox],
-        zoom=0.75,
-        front=[0, 0, -1],
-        lookat=[0, 0, 0.5],
-        up=[0, -1, 0])
+    gui.Application.instance.initialize()
+    window = gui.Application.instance.create_window("Open3D", 1024, 768)   # 4x3
+    scene = gui.SceneWidget()
+    scene.scene = rendering.Open3DScene(window.renderer)
+    window.add_child(scene)
+
+    scene.scene.add_geometry(f'pcd', pcd, rendering.MaterialRecord())
+    scene.scene.add_geometry(f'bbox', bbox, rendering.MaterialRecord())
+    scene.scene.add_geometry(f'origin', origin, rendering.MaterialRecord())
+
+    scene.setup_camera(60, bbox, [0, 0, 0])
+    scene.look_at(np.array([0, 0, 0.5], dtype=np.float32),  # lookat
+                  np.array([0, 0, -1], dtype=np.float32),   # front
+                  np.array([0, -1, 0], dtype=np.float32))   # up
+    gui.Application.instance.run()
+
+    # o3d.visualization.draw_geometries([pcd, origin, bbox],
+    #     zoom=0.75,
+    #     front=[0, 0, -1],
+    #     lookat=[0, 0, 0.5],
+    #     up=[0, -1, 0])
+
     return pcd
 
 
