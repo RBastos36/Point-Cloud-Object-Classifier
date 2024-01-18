@@ -46,6 +46,13 @@ def pcdFromCamera(camera_id):
 
         # Color image
         _, img_color = cap.read()
+        if img_color is None:
+            print('\nError: RGBD camera disconnected!')
+            cap.release()
+            openni2.unload()
+            cv2.destroyAllWindows()
+
+            raise SystemExit
 
 
         # Draw a crossair in the color image
@@ -77,8 +84,8 @@ def pcdFromCamera(camera_id):
 
 
     # Convert to Open3D images
-    color_raw = o3d.geometry.Image(cv2.flip(img_color, -1))
-    depth_raw = o3d.geometry.Image((cv2.flip(img_depth, -1) * 0.1).astype(np.uint16))     # Scaled down to 10%
+    color_raw = o3d.geometry.Image(img_color)
+    depth_raw = o3d.geometry.Image((img_depth * 0.1).astype(np.uint16))     # Scaled down to 10%
 
 
     # Create RGBDImage
@@ -93,18 +100,18 @@ def pcdFromCamera(camera_id):
 
 
     # Prepare visualization elements
-    bbox = o3d.geometry.AxisAlignedBoundingBox(min_bound=[-1, -1, 0], max_bound=[1, 1, 2])
+    bbox = o3d.geometry.AxisAlignedBoundingBox(min_bound=[-0.5, -0.5, 0], max_bound=[0.5, 0.5, 1])
     bbox.color = (1, 0, 0)
-    origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.05, origin=np.array([0., 0., 0.]))    
+    origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.05, origin=np.array([0., 0., 0.]))
     pcd = pcd.crop(bbox)
 
 
     # Show the final PCD
     o3d.visualization.draw_geometries([pcd, origin, bbox],
-        zoom=0.4,
+        zoom=0.75,
         front=[0, 0, -1],
-        lookat=[0, 0, 1],
-        up=[0, 1, 0])
+        lookat=[0, 0, 0.5],
+        up=[0, -1, 0])
     return pcd
 
 

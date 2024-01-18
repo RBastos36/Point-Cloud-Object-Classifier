@@ -59,7 +59,7 @@ class PlaneDetection:
         return text
 
 
-def getObjects(datapath, ask_for_input=True):
+def getObjects(datapath, cluster_eps, cluster_minpoints, ask_for_input=True):
 
     # Default view
     view = {
@@ -150,14 +150,16 @@ def getObjects(datapath, ask_for_input=True):
     # Find plane
 
     all_objects = p.findPlane()
+    # o3d.visualization.draw_geometries([all_objects])
     
     # ------------------------------------------------------
     # Clustering
     # ------------------------------------------------------
 
-    cluster_idxs = list(all_objects.cluster_dbscan(eps=0.031, min_points=74, print_progress=True))
+    cluster_idxs = list(all_objects.cluster_dbscan(eps=cluster_eps, min_points=cluster_minpoints, print_progress=True))
     obj_idxs = list(set(cluster_idxs))
-    obj_idxs.remove(-1)
+    if -1 in obj_idxs:
+        obj_idxs.remove(-1)
 
     number_of_objects = len(obj_idxs)
     print ('Number of objects: ' + str(number_of_objects))
@@ -306,4 +308,4 @@ if __name__ == "__main__":
     # datapath = 'data/scenes/pcd_new/05.pcd'
     # datapath = 'data/scenes/ply_original/05.ply'
 
-    getObjects(datapath)
+    getObjects(datapath, cluster_eps=0.031, cluster_minpoints=74)

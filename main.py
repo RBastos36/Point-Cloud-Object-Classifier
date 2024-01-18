@@ -48,7 +48,7 @@ def getAverageColorName(point_cloud):
     return color_name.capitalize()
 
 
-def getObjectHeight(point_cloud):
+def getObjectDimensions(point_cloud):
 
     # There is more than one way of getting the BBOX - Choose the one with the best results
 
@@ -60,7 +60,10 @@ def getObjectHeight(point_cloud):
     height = bbox_dim[2]
     height = round(height * 1000 * 0.9)  # milimeters, rounded
 
-    return f"{height} mm"
+    width = max(bbox_dim[0], bbox_dim[1])
+    width = round(width * 1000 * 0.9)
+
+    return height, width
 
 
 def openResultsWindow(objects):
@@ -86,7 +89,7 @@ def openResultsWindow(objects):
         # Add label
         label_pos = bbox.get_center()
         label_pos[2] += 0.15
-        label_text = f"{obj['label']}\nColor: {obj['color_name']}\nHeight: {obj['height']}"
+        label_text = f"{obj['label'].capitalize()}\nColor: {obj['color_name']}\nHeight: {obj['height']} mm\nWidth: {obj['width']} mm"
         scene.add_3d_label(label_pos, label_text)
 
     # Run
@@ -94,12 +97,19 @@ def openResultsWindow(objects):
     scene.setup_camera(60, scene_bounds, [0, 0, 0])
     gui.Application.instance.run()
 
-def voice(num_objs, str_list ,obj_max, height, color):
+def voice(num_objs, str_list ,obj_max, height, color, closest_to_center):
     
     file_name = 'Voice_file'
 
-    text = 'In this scene there are ' + str(num_objs) + 'objects, ' + str_list + '. The tallest one is the ' + str(obj_max) + ', it is ' + str(round(height)) + ' mm tall and its color is ' + color + '.'
+    if num_objs > 1:
+        text = 'In this scene there are ' + str(num_objs) + ' objects: '
+    else:
+        text = 'In this scene there is one object: '
+    text += str_list + \
+        '. The tallest one is the ' + str(obj_max) + ', it is ' + str(round(height)) + ' mm tall and its color is ' + color + \
+        '. The object closest to the middle of the table is a ' + closest_to_center + '.' 
     language = 'en'
+    print('\nTTS: ' + text + '\n')
     tts = gTTS(text=text, lang=language, slow=False)
 
     # Saving audio file
@@ -110,10 +120,14 @@ def voice(num_objs, str_list ,obj_max, height, color):
     os.remove(file_name + '.mp3')
 
 
-def analyseScene(scene_path, model_path, manual_inputs):
+def analyseScene(scene_path, model_path, manual_inputs, camera_image=False):
 
     # Pre-processing: get objects from the scene
-    objects = getObjects(scene_path, manual_inputs)
+    if not camera_image:
+        objects = getObjects(scene_path, cluster_eps=0.031, cluster_minpoints=74, ask_for_input=manual_inputs)
+    else:
+        objects = getObjects(scene_path, cluster_eps=0.1, cluster_minpoints=40, ask_for_input=False)
+
     print(f'{len(objects)} objects detected!')
 
     if len(objects) < 1:
@@ -129,22 +143,23 @@ def analyseScene(scene_path, model_path, manual_inputs):
     for i, obj in enumerate(objects):
         if int(obj['idx']) == i:
             obj['label'] = predicted_labels[i]
-            obj_label = obj['label']
-            if obj_label == 'cereal':
-                obj_label = 'cereal box'
-            elif obj_label == 'coffee':
-                obj_label = ' coffee mug'
-            elif obj_label == 'soda':
-                obj_label = 'soda can'
+            if obj['label'] == 'cereal':
+                obj['label'] = 'cereal box'
+            elif obj['label'] == 'coffee':
+                obj['label'] = 'coffee mug'
+            elif obj['label'] == 'soda':
+                obj['label'] = 'soda can'
 
-            obj_labels.append(obj_label)
+            obj_labels.append(obj['label'])
 
         obj['color_name'] = getAverageColorName(obj['points'])
         color = obj['color_name']
         colors.append(color)
-        obj['height'] = getObjectHeight(obj['points'])
-        height = float(obj['height'].split(' ')[0])
-        heights.append(height)
+        obj['height'], obj['width'] = getObjectDimensions(obj['points'])
+        obj['dist_to_center'] = np.linalg.norm(obj['center'] - np.array([0, 0, 0]))
+        print(obj['dist_to_center'])
+
+        heights.append(obj['height'])
 
     # Calling TTS ------------------
     
@@ -167,31 +182,47 @@ def analyseScene(scene_path, model_path, manual_inputs):
                 string = string + " and a " + name
             else:
                 if name == "cereal box":
-                    string = string + " and " + str(counts[idx]) + ' ' + name + "es "
+                    string = string + " and " + str(counts[idx]) + ' ' + name + "es"
                 else:
-                    string = string + " and " + str(counts[idx]) + ' ' + name + "s "
+                    string = string + " and " + str(counts[idx]) + ' ' + name + "s"
 
         elif idx == 0:
             if counts[idx] == 1:
                 string = "a " + name
             else:
                 if name == "cereal box":
-                    string = str(counts[idx]) + " " + name + "es "
-                    string = str(counts[idx]) + " " + name + "es "
+                    string = str(counts[idx]) + " " + name + "es"
+                    string = str(counts[idx]) + " " + name + "es"
                 else:
-                    string = str(counts[idx]) + " " + name + "s "
+                    string = str(counts[idx]) + " " + name + "s"
 
         elif 0 < idx < (len(dif_objs) - 1):
             if counts[idx] == 1:
                 string = string + ", a " + name
             else:
                 if name == "cereal box":
-                    string = string + ", " + str(counts[idx]) + " " + name + "es "
+                    string = string + ", " + str(counts[idx]) + " " + name + "es"
                 else:
-                    string = string + ", " + str(counts[idx]) + " " + name + "s "
-                
-    
-    thread = threading.Thread(target=voice, args=(num_labels, string, label, max_height, max_color))
+                    string = string + ", " + str(counts[idx]) + " " + name + "s"
+
+    if len(dif_objs) == 1:
+        name = dif_objs[0]
+        if counts[0] > 1:
+            if name == "cereal box":
+                name += "es"
+            else:
+                name += "s"
+
+        if counts[0] == 1:
+            string = "a " + name
+        else:
+            string = str(counts[0]) + " " + name
+
+    # Find closest to center
+    min_entry = min(objects, key=lambda x: x["dist_to_center"])
+    closest_object = min_entry["label"]
+
+    thread = threading.Thread(target=voice, args=(num_labels, string, label, max_height, max_color, closest_object))
     thread.start()
 
     # ------------------------------
@@ -238,6 +269,7 @@ def main():
     def buttonViewScene():
         scene_path = 'data/scenes/pcd/' + selected_scene.get() + '.pcd'
         pcd = o3d.io.read_point_cloud(scene_path)
+        origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2, origin=np.array([0., 0., 0.]))
 
         view = {
             "class_name" : "ViewTrajectory",
@@ -259,7 +291,7 @@ def main():
             "version_minor" : 0
         }
 
-        o3d.visualization.draw_geometries([pcd],
+        o3d.visualization.draw_geometries([pcd, origin],
                                         zoom=view['trajectory'][0]['zoom'],
                                         front=view['trajectory'][0]['front'],
                                         lookat=view['trajectory'][0]['lookat'],
@@ -269,11 +301,11 @@ def main():
     def buttonOpenCamera():
         pcd_path = 'Camera/temp.pcd'
         try:
-            initCamera(pcd_path)    
+            initCamera(pcd_path)
         except SystemExit:
-            pass
+            return
         model_path = 'models/'+model_name.get()
-        analyseScene(pcd_path, model_path, manual_inputs=False)
+        analyseScene(pcd_path, model_path, manual_inputs=False, camera_image=True)
 
 
     # Get list of scenes
