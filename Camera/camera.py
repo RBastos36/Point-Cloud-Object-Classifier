@@ -29,7 +29,7 @@ def pcdFromCamera(camera_id):
     # Initialize OpenCV
     cap = cv2.VideoCapture(camera_id)
     cv2.namedWindow('Color & Depth Images')
-    cv2.moveWindow('Color & Depth Images', 500, 20)
+    cv2.moveWindow('Color & Depth Images', 700, 20)
 
 
     # Main loop

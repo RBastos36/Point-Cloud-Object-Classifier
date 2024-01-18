@@ -233,6 +233,14 @@ def analyseScene(scene_path, model_path, manual_inputs, camera_image=False):
     openResultsWindow(objects)
 
 
+def validateIntegerInput(new_value):
+    if new_value == "":
+        return True  # Allow empty input
+    try:
+        return int(new_value) > 0
+    except ValueError:
+        return False
+
 
 
 def main():
@@ -258,7 +266,13 @@ def main():
 
 
     def buttonTestModel():
-        testModel(model_path='models/'+model_name.get(), file_count=100, batch_size=10, metrics_averaging=str(metrics_variable.get()))
+        try:
+            batch_size = int(input_batch_size.get())
+            file_count = int(input_file_count.get())
+        except ValueError:
+            print('Invalid input. Batch size and file count must be integers')
+
+        testModel(model_path='models/'+model_name.get(), file_count=file_count, batch_size=batch_size, metrics_averaging=str(metrics_variable.get()))
 
 
     def buttonOpenScene():
@@ -339,19 +353,28 @@ def main():
     # root.geometry("400x300")
     root.resizable(width=False, height=False)
 
+    frame_model = tk.Frame(root, borderwidth=2, relief="groove", pady=10)
+    frame_model.grid(row=0, column=0, columnspan=3, sticky="nsew")
+
     frame_train = tk.Frame(root, borderwidth=2, relief="groove", pady=10, padx=15)
     frame_train.grid(row=1, column=0, sticky="nsew")
 
+    frame_test = tk.Frame(root, borderwidth=2, relief="groove", pady=10, padx=15)
+    frame_test.grid(row=1, column=1, sticky="nsew")
+
     frame_scenes = tk.Frame(root, borderwidth=2, relief="groove", pady=10, padx=15)
-    frame_scenes.grid(row=1, column=1, sticky="nsew")
+    frame_scenes.grid(row=1, column=2, sticky="nsew")
 
 
-    label = tk.Label(root, text="Selected Model:")
-    label.grid(row=0, column=0, pady=15)
+    # Top bar: model path
+    tk.Label(frame_model, text="").grid(row=0, column=0, padx=70)
 
-    model_name = tk.Entry(root, width=18)
+    label = tk.Label(frame_model, text="Selected Model:")
+    label.grid(row=0, column=1, pady=5, padx=5)
+
+    model_name = tk.Entry(frame_model, width=15)
     model_name.insert(0, "save_8.pth")
-    model_name.grid(row=0, column=1, pady=15)
+    model_name.grid(row=0, column=2)
 
 
     # Column 1: Train Model
@@ -367,23 +390,41 @@ def main():
     button = tk.Button(frame_train, text="New Train", command=buttonNewTrain, width=15)
     button.pack(pady=5)
 
-    button = tk.Button(frame_train, text="Test Model", command=buttonTestModel, width=15)
-    button.pack(pady=5)
+
+    # Column 2: Test Model
+    label = tk.Label(frame_test, text="Test Model")
+    label.grid(row=0, column=0, columnspan=2)
+
+    label = tk.Label(frame_test, text="Batch size:")
+    label.grid(row=1, column=0, pady=8)
+
+    input_batch_size = tk.Entry(frame_test, validate="key", width=5, validatecommand=(frame_test.register(validateIntegerInput), '%P'))
+    input_batch_size.insert(0, "10")
+    input_batch_size.grid(row=1, column=1, pady=8)
+
+    label = tk.Label(frame_test, text="File count:")
+    label.grid(row=2, column=0, pady=5)
+
+    input_file_count = tk.Entry(frame_test, validate="key", width=5, validatecommand=(frame_test.register(validateIntegerInput), '%P'))
+    input_file_count.insert(0, "100")
+    input_file_count.grid(row=2, column=1, pady=5)
+
 
     # Radio button to choose between 'macro' and 'micro' averaging in precision and recall metrics
-    tk.Label(frame_train, text="Metrics Averaging:").pack()
+    tk.Label(frame_test, text="Metrics Averaging:").grid(row=3, column=0, columnspan=2, pady=5)
 
-    metrics_variable = tk.StringVar(frame_train, "macro")
-
-    values = {"macro" : "macro", 
-              "micro" : "micro"}
-    
-    for (text, value) in values.items(): 
-        ttk.Radiobutton(frame_train, text = text, variable = metrics_variable, value = value).pack(pady=5)
+    metrics_variable = tk.StringVar(frame_test, "macro")
+    radiobtn = ttk.Radiobutton(frame_test, text = "macro", variable = metrics_variable, value = "macro")
+    radiobtn.grid(row=4, column=0, columnspan=2, pady=5)
+    radiobtn = ttk.Radiobutton(frame_test, text = "micro", variable = metrics_variable, value = "micro")
+    radiobtn.grid(row=5, column=0, columnspan=2, pady=5)
 
 
+    button = tk.Button(frame_test, text="Start Test", command=buttonTestModel, width=15)
+    button.grid(row=6, column=0, columnspan=2, pady=5)
 
-    # Column 2: Find Objects
+
+    # Column 3: Find Objects
     label = tk.Label(frame_scenes, text="Find Objects in Scene")
     label.pack()
 
@@ -392,14 +433,14 @@ def main():
     dropdown_menu = ttk.Combobox(frame_scenes, textvariable=selected_scene, values=scenes, state="readonly", width=15)
     dropdown_menu.pack(pady=9)
 
+    button = tk.Button(frame_scenes, text="View Full Scene", command=buttonViewScene, width=15)
+    button.pack(pady=5)
+
     checkbox_value = tk.IntVar()
     checkbox = tk.Checkbutton(frame_scenes, text="Manual Inputs", variable=checkbox_value)
     checkbox.pack(pady=10)
 
     button = tk.Button(frame_scenes, text="Open Scene", command=buttonOpenScene, width=15)
-    button.pack(pady=5)
-
-    button = tk.Button(frame_scenes, text="View Full Scene", command=buttonViewScene, width=15)
     button.pack(pady=5)
 
     button = tk.Button(frame_scenes, text="Open Camera", command=buttonOpenCamera, width=15)
