@@ -7,159 +7,103 @@ from openni import openni2
 from openni import _openni2 as c_api
 
 
-view = {
-	"class_name" : "ViewTrajectory",
-	"interval" : 29,
-	"is_loop" : False,
-	"trajectory" : 
-	[
-		{
-			"boundingbox_max" : [ 0.41590951312155949, 0.97330287524632042, -0.60100001096725464 ],
-			"boundingbox_min" : [ -1.815977123124259, -0.56555715061369394, -2.9839999675750732 ],
-			"field_of_view" : 60.0,
-			"front" : [ -0.78974422652934717, -0.027044285339143485, 0.61283983494389316 ],
-			"lookat" : [ -0.022561790241817495, -0.25108904807479676, -0.22964330450237716 ],
-			"up" : [ 0.18644403931156128, 0.94118476024943876, 0.28179756436029674 ],
-			"zoom" : 0.35999999999999854
-		}
-	],
-	"version_major" : 1,
-	"version_minor" : 0
-}
-
-
-# ----------------------------------
-# Functions and Classes to Pointcloud processing
-# ----------------------------------
-
-def convert_pcd_to_off(pcd_file, off_file):
-    # Read PCD file
-    pcd = o3d.io.read_point_cloud(pcd_file)
-
-    # Downsample the point cloud (optional, but can be useful for large point clouds)
-    pcd = pcd.voxel_down_sample(voxel_size=0.005)
-
-    # Estimate normals for the point cloud
-    pcd.estimate_normals()
-
-    # Create a surface mesh using Poisson surface reconstruction
-    mesh, _ = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd)
-
-    # Save as OFF file
-    o3d.io.write_triangle_mesh(off_file, mesh)
-
-class PlaneDetection:
-    def __init__(self, point_cloud):
-
-        self.point_cloud = point_cloud
-
-    def colorizeInliers(self, r, g, b):
-        self.inlier_cloud.paint_uniform_color([r, g, b])
-
-    def segment(self, distance_threshold=0.03, ransac_n=4, num_iterations=200):    # Find plane
-
-        print('Starting plane detection')
-        plane_model, inlier_idxs = self.point_cloud.segment_plane(distance_threshold=distance_threshold, ransac_n=ransac_n, num_iterations=num_iterations)
-        [self.a, self.b, self.c, self.d] = plane_model
-
-        self.inlier_cloud = self.point_cloud.select_by_index(inlier_idxs)
-
-        outlier_cloud = self.point_cloud.select_by_index(inlier_idxs, invert=False)
-
-        return outlier_cloud
-
-    def __str__(self):
-
-        text = 'Segmented plane from pc with ' + str(len(self.point_cloud.points)) + ' with ' + str(len(self.inlier_cloud.points)) + ' inliers. '
-        text += '\nPlane: ' + str(self.a) + ' x + ' + str(self.b) + ' y + ' + str(self.c) + ' z + ' + str(self.d) + ' = 0'
-        return text
-
-
-
-
 def main():
 
-    # Initialize the depth device
+    # Initialize the depth stream
     openni2.initialize()
     dev = openni2.Device.open_any()
-
-    # Start the depth stream
     depth_stream = dev.create_depth_stream()
     depth_stream.start()
     depth_stream.set_video_mode(c_api.OniVideoMode(pixelFormat = c_api.OniPixelFormat.ONI_PIXEL_FORMAT_DEPTH_100_UM, resolutionX = 640, resolutionY = 480, fps = 30))
 
-    # Initial OpenCV Window Functions
-    cv2.namedWindow("Color Image")
-    cv2.namedWindow("Depth Image")
 
-
+    # Initialize OpenCV camera
     cap = cv2.VideoCapture(2)
 
 
-    # Loop
-    while True:
+    # Initialize Open3D visualization window
+    vis = o3d.visualization.Visualizer()
+    vis.create_window(width=1000, height=1000, left=900)
+    origin = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.25, origin=np.array([0., 0., 0.]))
+    bbox = o3d.geometry.AxisAlignedBoundingBox(min_bound=[-0.5, -0.5, -1], max_bound=[0.5, 0.5, 1])
+    bbox.color = (1, 0, 0)
+
+
+    # Main loop
+    while vis.poll_events():
 
         # Depth image
         frame = depth_stream.read_frame()
         frame_data = frame.get_buffer_as_uint16()
-
         img_depth = np.frombuffer(frame_data, dtype=np.uint16)
-        img_depth.shape = (1, 480, 640)
-        img_depth = np.concatenate((img_depth, img_depth, img_depth), axis=0)
-        img_depth = np.swapaxes(img_depth, 0, 2)
-        img_depth = np.swapaxes(img_depth, 0, 1)
+        img_depth.shape = (480, 640)
+        img_depth = cv2.flip(img_depth, 1)
 
 
         # Color image
         _, img_color = cap.read()
-        img_color = cv2.flip(img_color, 1)
 
 
-        # Show Images
-        cv2.imshow("Depth Image", img_depth)
-        cv2.imshow("Color Image", img_color)
+        # Convert to Open3D images
+        color_raw = o3d.geometry.Image(img_color)
+        depth_raw = o3d.geometry.Image((img_depth * 0.1).astype(np.uint16))     # Scaled down to 10%
 
 
-        # Close with ESC
-        if cv2.waitKey(1) & 0xFF == 27:
-            break
-        
-        # Creating Pointcloud from camera RGB-D image
+        # Create RGBDImage
+        rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(color_raw, depth_raw)
 
-        rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-            img_color, img_depth)
-        
+
+        # Create PointCloud from RGBDImage
         pcd = o3d.geometry.PointCloud.create_from_rgbd_image(
             rgbd_image,
             o3d.camera.PinholeCameraIntrinsic(
                 o3d.camera.PinholeCameraIntrinsicParameters.PrimeSenseDefault))
+        
 
-        # Flip the point cloud to handle orientation issues
-        pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-
-        # ---------------------------------------------------
-        # PointCloud Processing
-        # ---------------------------------------------------
+        # Small transformation to help visualize and point camera
+        pcd_vis = pcd.crop(bbox)
+        pcd_vis.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])   # Invert up/down
 
 
+        # Update visualization
+        vis.clear_geometries()
+        vis.add_geometry(pcd_vis)
+        vis.add_geometry(origin)
+        vis.add_geometry(bbox)
+        vis.update_renderer()
 
-        # ------------------------------------------
-        # Visualization
-        # ------------------------------------------
 
-        entities = [pcd]
+        # OpenCV Images
+        center_x, center_y = img_color.shape[1] // 2, img_color.shape[0] // 2
+        cv2.line(img_color, (center_x, center_y-20), (center_x, center_y+20), (0, 255, 0), 2)
+        cv2.line(img_color, (center_x-20, center_y), (center_x+20, center_y), (0, 255, 0), 2)
 
-        o3d.visualization.draw_geometries(entities,
-                                            zoom=view['trajectory'][0]['zoom'],
-                                            front=view['trajectory'][0]['front'],
-                                            lookat=view['trajectory'][0]['lookat'],
-                                            up=view['trajectory'][0]['up'])
+        img_depth_bgr = cv2.cvtColor(img_depth, cv2.COLOR_GRAY2BGR)
+        cv2.normalize(img_depth_bgr, img_depth_bgr, 0, 255, cv2.NORM_MINMAX)
+        img_depth_bgr = img_depth_bgr.astype(np.uint8)
+
+        img_concat = np.vstack([img_color, img_depth_bgr])
+        cv2.imshow("Color & Depth Images", img_concat)
+
+
+        # Exit loop with enter/space/esc
+        if cv2.waitKey(1) & 0xFF in [13, 32, 27]:
+            break
 
 
     # Close all windows and unload/release devices
     cap.release()
     openni2.unload()
     cv2.destroyAllWindows()
+    vis.destroy_window()
+
+
+    # Show the final PCD
+    o3d.visualization.draw_geometries([pcd, origin],
+        zoom=0.4,
+        front=[0, 0, -1],
+        lookat=[0, 0, 1.5],
+        up=[0, -1, 0])
 
 
 if __name__ == "__main__":
