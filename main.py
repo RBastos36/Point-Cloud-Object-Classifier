@@ -98,27 +98,27 @@ def openResultsWindow(objects):
     gui.Application.instance.run()
 
 
-def voice(num_objs, str_list ,obj_max, height, color, closest_to_center):
+def voice(num_objs, str_list, obj_max, height, color, closest_to_center):
     
-    file_name = 'Voice_file'
+    file_name = 'Voice_file.mp3'
 
     if num_objs > 1:
-        text = 'In this scene there are ' + str(num_objs) + ' objects: '
+        text = 'In this scene there are ' + str(num_objs) + ' objects: ' + str_list + \
+            '. The tallest one is the ' + str(obj_max) + ', it is ' + str(round(height)) + ' mm tall and its color is ' + color + \
+            '. The object closest to the middle of the table is a ' + closest_to_center + '.' 
     else:
-        text = 'In this scene there is one object: '
-    text += str_list + \
-        '. The tallest one is the ' + str(obj_max) + ', it is ' + str(round(height)) + ' mm tall and its color is ' + color + \
-        '. The object closest to the middle of the table is a ' + closest_to_center + '.' 
+        text = 'In this scene there is one object: ' + str_list + \
+            '. It is ' + str(round(height)) + ' mm tall and its color is ' + color + '.'
+
     language = 'en'
     print('\nTTS: ' + text + '\n')
     tts = gTTS(text=text, lang=language, slow=False)
 
     # Saving audio file
-    tts.save(file_name + '.mp3')
-    os.system("play " + file_name + ".mp3"+" tempo 1.2")
+    tts.save(file_name)
+    os.system("play " + file_name + " tempo 1.2")
 
     # Deleting audio file
-    file_name += '.mp3'
     if os.path.exists(file_name):
         os.remove(file_name)
 
