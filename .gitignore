@@ -16,7 +16,7 @@ Pre-processing_Testing/pcd/*.pcd
 
 # Temporary files
 **pcd_point_cloud.pcd
-
+Camera/temp.pcd
 
 *.label
 *.pose

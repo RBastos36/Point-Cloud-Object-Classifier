@@ -227,6 +227,10 @@ def getObjects(datapath, ask_for_input=True):
 
         objects.append(d)
 
+
+    if len(objects) < 1:
+        return []
+
     # Deleting existent .off in the folder
 
     for file in glob.glob('PreProcessing/Objects_off/*.off'):
