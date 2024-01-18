@@ -139,9 +139,9 @@ Additionally, properties of the objects are extracted, including color and heigh
 <details >
 <summary><b>Real Time System</b></summary>
 
-This part of the program uses the color and depth images from a connected RGBD camera (Asttra Pro NL). The depth image is obtained using `openni2` and displayed next to the color image in an `opencv` window. Here, the user can point the camera at the desired location and see the resulting images.
+This part of the program uses the color and depth images from a connected RGBD camera (Astra Pro NL). The depth image is obtained using `openni2` and displayed next to the color image in an `opencv` window. Here, the user can point the camera at the desired location and see the resulting images.
 
-When happy with the current images, the user can press Enter to confirm and exit the while loop. A point cloud is generated from the images obtained using `open3d`. This point cloud is then used as a scene to detect and classify objetcs.
+When happy with the current images, the user can press Enter to confirm and exit the while loop. A point cloud is generated from the images obtained using `open3d`. This point cloud is then used as a scene to detect and classify objects.
 
 </details>
 
