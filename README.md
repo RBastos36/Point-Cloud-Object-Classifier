@@ -1,6 +1,6 @@
-# SAVI - Trabalho Prático 2
+# SAVI - Practical Assignment 2
 
-Sistemas Avançados de Visualização Industrial (SAVI) - Grupo 3 - Universidade de Aveiro - 2023/24
+Advanced Industrial Visualization Systems (**S**istemas **A**vançados de **V**isualização **I**ndustrial) - Group 3 - University of Aveiro - 2023/24
 
 ## Table of Contents
 
