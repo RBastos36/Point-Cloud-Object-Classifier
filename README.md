@@ -97,7 +97,7 @@ git clone https://github.com/Goncalo287/savi_t2/
 ```
 2. Change into the project directory:
 ```bash
-cd savi_t2
+cd SAVI-TP2
 ```
 3. Run the program:
 ```bash
