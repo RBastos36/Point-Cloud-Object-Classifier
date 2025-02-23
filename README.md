@@ -1,6 +1,6 @@
 # SAVI - Practical Assignment 2
 
-Advanced Industrial Visualization Systems (**S**istemas **A**vançados de **V**isualização **I**ndustrial) - Group 3 - University of Aveiro - 2023/24
+Advanced Systems of Industrial Vision (**S**istemas **A**vançados de **V**isualização **I**ndustrial) - Group 3 - University of Aveiro - 2023/24
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ Advanced Industrial Visualization Systems (**S**istemas **A**vançados de **V**i
 ---
 ## Introduction
 
-<p align="justify"> In this assignment, a point cloud based model was created and trained to guess objects displayed in different scenes. This program needs to pre-process the scene to retrieve each object and its properties to feed the model, narrating the object prediction and its characteristics through a text-to-speech library. Furthermore, this model was also applied to a real-time system using a RGB-D camera.</p>
+<p align="justify"> In this assignment, a point cloud-based model was created and trained to guess objects displayed in different scenes. This program needs to pre-process the scene to retrieve each object and its properties to feed the model, narrating the object prediction and its characteristics through a text-to-speech library. Furthermore, this model was also applied to a real-time system using a RGB-D camera.</p>
 
 ---
 ## Datasets Used
@@ -33,7 +33,7 @@ To develop this project, a dataset splitter was used to divide the dataset files
 To run the program and scripts presented in this repository, some libraries need to be installed beforehand. These are the following:
 
 - **[Open3D](https://www.open3d.org/)**
-  - Description: library that allows for rapid reading, manipulating and storing of 3D data, like point clouds.
+  - Description: a library that allows for rapid reading, manipulating, and storing of 3D data, like point clouds.
   - Installation:
     ```bash
     pip install open3d
@@ -77,7 +77,7 @@ To run the program and scripts presented in this repository, some libraries need
     ```
 
 - **[OpenNI 2](https://structure.io/openni/)**
-  - Description: This is optional and only required if you want to use the real-time object detection with an RGBD camera. The camera used was an "Astra Pro NL", for different cameras this implementation may be different.
+  - Description: This is optional and only required if you want to use real-time object detection with an RGBD camera. The camera used was an "Astra Pro NL", for different cameras this implementation may be different.
   - Installation:
     - [Download the latest version](https://structure.io/openni/)
     - [Follow this installation guide](https://astra-wiki.readthedocs.io/en/latest/installation.html#linux)
@@ -207,7 +207,7 @@ The global precision was calculated using 'macro' averaging, but the user can ch
 </p>
 
 <p align="center">
-<b>Figure 2</b> - Objects identified in the scene, predicted labels and respective properties.
+<b>Figure 2</b> - Objects identified in the scene, predicted labels, and respective properties.
 </p> 
 
 </details>
